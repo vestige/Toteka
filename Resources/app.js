@@ -10,14 +10,14 @@ var ground = Ti.UI.createWindow({
 
 var top = Ti.UI.createView({
 	backgroundColor: '#333',
-	height: 100
+	height: '20%'
 });
 
 var title = Ti.UI.createLabel({
 	text: 'toteka timer',
 	textAlign: 'center',
 	color: '#ddd',
-	height: '120%',
+	font:{fontSize: '100%'},
 })
 
 var contents = Ti.UI.createView({
@@ -35,12 +35,13 @@ var qa = Ti.UI.createLabel({
 var count = Ti.UI.createLabel({
 	text: '88:88',
 	color: '#444',
-	font:{fontSize: '200%'},
+	top: 20,
+	font:{fontSize: '250%'},
 });
 
 var footer = Ti.UI.createView({
 	backgroundColor: '#333',
-	height: 50
+	height: '10%'
 });
 
 var toolview = Ti.UI.createView({
@@ -81,17 +82,17 @@ function date_format(counting) {
 	disp_time += sec;
 	console.log(disp_time);
 	return disp_time;
-}
+};
 
 function update () {
 	var tmp_time = new Date();
 	
-	if (tmp_time.getSeconds() - past_time.getSeconds() >= 1) {
+	if (tmp_time.getSeconds() != past_time.getSeconds()) {
 		counting -= 1;
 		if (counting < 0) {
-			stop.fireEvent('click');
 			qa.text = '';
 			count.text = "Finish";
+			stop.fireEvent('click');
 		} else {
 			if (counting == remain) {
 				contents.backgroundColor = '#777';
@@ -121,7 +122,7 @@ function timerClear(){
 	qa.text = '';
 	contents.backgroundColor = '#000';
 	pause = 0;
-}
+};
 
 clear.addEventListener('click', function (){
 	timerClear();
