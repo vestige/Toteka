@@ -4,5 +4,7 @@
 
 timer application
 
+---
+直下にあるtotekaApp.tarを展開して、index.htmlを開けば動かすことができます（たぶん）
 
  
