@@ -102,21 +102,20 @@ function update () {
             }
             count.text = date_format(counting);
             past_time = tmp_time;
-            timer_id = setTimeout("update()", 100);
+            timer_id = setTimeout("update()", 300);
         }
     } else {
-        timer_id = setTimeout("update()", 100);
+        timer_id = setTimeout("update()", 300);
     }
 };
 
-var start_time;
 var past_time;
 var counting;
 var timer_id;
 var pause = 0;
 
 function timerClear(){
-    start_time = new Date();
+    var start_time = new Date();
     past_time = start_time;
     if (spanSwitch.value) {
         counting = 25 * 60;

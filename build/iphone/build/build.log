@@ -5,7 +5,7 @@ reporting an issue to help us understand your environment, build settings
 and aid in debugging. Please attach this log to any issue that you report.
 ================================================================================
 
-Starting build at 10/07/12 19:03
+Starting build at 10/07/12 21:15
 
 Build details:
 
@@ -22,8 +22,8 @@ Script arguments:
    /Users/vestige/Documents/Titanium_Studio_Workspace/Toteka
    vst
    Toteka
-   iphone
-   iphone
+   ipad
+   ipad
    
 
 Building from: /Users/vestige/Library/Application Support/Titanium/mobilesdk/osx/2.1.2.GA/iphone
