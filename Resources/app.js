@@ -1,7 +1,3 @@
-// 10min + 5min(Q&A) 最後に拍手
-// 20min + 5min(Q&A) 最後に拍手
-//optiondialog , switch
-
 Titanium.UI.setBackgroundColor('#000');
 
 var ground = Ti.UI.createWindow({
