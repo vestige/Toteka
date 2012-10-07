@@ -1,7 +1,3 @@
-// 10min + 5min(Q&A) 最後に拍手
-// 20min + 5min(Q&A) 最後に拍手
-//optiondialog , switch
-
 Titanium.UI.setBackgroundColor('#000');
 
 var ground = Ti.UI.createWindow({
@@ -33,7 +29,7 @@ var qa = Ti.UI.createLabel({
 });
 
 var count = Ti.UI.createLabel({
-	text: '88:88',
+	text: '00:00',
 	color: '#444',
 	top: 20,
 	font:{fontSize: '250%'},
@@ -53,16 +49,24 @@ var toolview = Ti.UI.createView({
 
 var start = Ti.UI.createButton({
 	title: 'start',
+	height: 42,
 });
 
 var stop = Ti.UI.createButton({
 	title: 'stop',
 	left: 10,
+	height: 42,
 });
 
 var clear = Ti.UI.createButton({
 	title: 'clear',
 	left: 10,
+	height: 42,
+});
+
+var spanSwitch = Ti.UI.createSwitch({
+	left: 10,
+  	value: true 
 });
 
 function date_format(counting) {
@@ -90,8 +94,8 @@ function update () {
 	if (tmp_time.getSeconds() != past_time.getSeconds()) {
 		counting -= 1;
 		if (counting < 0) {
-			qa.text = '';
-			count.text = "Finish";
+			qa.text = 'Finish!';
+			count.text = "88888888";
 			stop.fireEvent('click');
 		} else {
 			if (counting == remain) {
@@ -116,8 +120,12 @@ var pause = 0;
 function timerClear(){
 	start_time = new Date();
 	past_time = start_time;
-	counting = 10;
-	remain = 5;	
+	if (spanSwitch.value) {
+		counting = 25 * 60;
+	} else {
+		counting = 15 * 60;
+	}
+	remain = 5 * 60;	
 	count.text = date_format(counting);
 	qa.text = '';
 	contents.backgroundColor = '#000';
@@ -154,7 +162,7 @@ contents.add(count);
 toolview.add(start);
 toolview.add(stop);
 toolview.add(clear);
-
+toolview.add(spanSwitch);
 footer.add(toolview);
 
 ground.add(top);
