@@ -74,7 +74,6 @@ function date_format(counting) {
 	var sec = counting % 60;
 	var disp_time = '';
 	
-	console.log("min >>" + min + "sec >>" + sec);
 	if (min < 10) {
 		disp_time += '0';
 	}
@@ -84,7 +83,6 @@ function date_format(counting) {
 		disp_time += '0';
 	}
 	disp_time += sec;
-	console.log(disp_time);
 	return disp_time;
 };
 
@@ -137,8 +135,6 @@ clear.addEventListener('click', function (){
 });
 
 start.addEventListener('click', function () {
-	console.log("start");
-
 	if (pause === 0) {
 		timerClear();
 	} else {
