@@ -1,5 +1,17 @@
 Titanium.UI.setBackgroundColor('#000');
 
+WebFontConfig = {
+    google: { families: [ 'Montserrat+Subrayada::latin', 'Ewert::latin'] }
+};
+(function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+ })();
+
 var ground = Ti.UI.createWindow({
     layout: 'vertical'
 });
@@ -9,11 +21,12 @@ var top = Ti.UI.createView({
     height: '20%'
 });
 
-var title = Ti.UI.createLabel({
+var caption = Ti.UI.createLabel({
     text: 'toteka timer',
     textAlign: 'center',
     color: '#ddd',
-    font:{fontSize: '100%'},
+    width: '100%',
+    font:{fontSize: '100%', fontFamily: 'Montserrat Subrayada'},
 })
 
 var contents = Ti.UI.createView({
@@ -25,14 +38,15 @@ var contents = Ti.UI.createView({
 var qa = Ti.UI.createLabel({
     text: '',
     color: 'white',
-    font:{fontSize: '70%'},		
+    top: 10,
+    font:{fontSize: '70%', fontFamily:'Ewert'},		
 });
 
 var count = Ti.UI.createLabel({
     text: '00:00',
     color: '#444',
-    top: 20,
-    font:{fontSize: '250%'},
+    top: 30,
+    font:{fontSize: '250%', fontFamily: 'sans-serif'},
 });
 
 var footer = Ti.UI.createView({
@@ -92,6 +106,8 @@ function update () {
     if (tmp_time.getSeconds() != past_time.getSeconds()) {
         counting -= 1;
         if (counting < 0) {
+            qa.color = '#FFFF00';
+            qa.font = {fontSize: '100%', fontFamily:'Ewert'};
             qa.text = 'Finish!';
             count.text = "88888888";
             stop.fireEvent('click');
@@ -122,7 +138,8 @@ function timerClear(){
     } else {
         counting = 15 * 60;
     }
-    remain = 5 * 60;	
+    remain = 5 * 60;
+
     count.text = date_format(counting);
     qa.text = '';
     contents.backgroundColor = '#000';
@@ -149,7 +166,7 @@ stop.addEventListener('click', function () {
     pause = 1;
 });
 
-top.add(title);
+top.add(caption);
 contents.add(qa);
 contents.add(count);
 
