@@ -104,19 +104,19 @@ function update () {
     var tmp_time = new Date();
 	
     if (tmp_time.getSeconds() != past_time.getSeconds()) {
-        counting -= 1;
-        if (counting < 0) {
+        total -= 1;
+        if (total < 0) {
             qa.color = '#FFFF00';
             qa.font = {fontSize: '120%', fontFamily: 'Expletus Sans'};
             qa.text = 'Finish!';
             count.text = "88888888";
             stop.fireEvent('click');
         } else {
-            if (counting == remain) {
+            if (total == remain) {
                 contents.backgroundColor = '#777';
                 qa.text = 'Question?';
             }
-            count.text = date_format(counting);
+            count.text = date_format(total);
             past_time = tmp_time;
             timer_id = setTimeout("update()", 300);
         }
@@ -126,21 +126,22 @@ function update () {
 };
 
 var past_time;
-var counting;
+var total;
 var timer_id;
 var pause = 0;
+var remain;
 
 function timerClear(){
     var start_time = new Date();
     past_time = start_time;
     if (spanSwitch.value) {
-        counting = 25 * 60;
+        total = 25 * 60;
     } else {
-        counting = 15 * 60;
+        total = 15 * 60;
     }
     remain = 5 * 60;
     
-    count.text = date_format(counting);
+    count.text = date_format(total);
     qa.text = '　';
     qa.font = {fontSize: '70%', fontFamily: 'Expletus Sans'};
     contents.backgroundColor = '#000';
