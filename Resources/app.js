@@ -83,6 +83,12 @@ var spanSwitch = Ti.UI.createSwitch({
     value: true 
 });
 
+var demo = Ti.UI.createButton({
+    title: 'demo',
+    left: 30,
+    height: 42,
+});
+
 function date_format(seconds) {
     var min = parseInt(seconds / 60);
     var sec = seconds % 60;
@@ -131,30 +137,45 @@ var timer_id;
 var pause = 0;
 var remain;
 
-function timerClear(){
-    var start_time = new Date();
-    past_time = start_time;
+function initTotalandRemain(demo_mode) {
+    if (demo_mode) {
+        total = 10;
+        remain = 5;
+        return;
+    }
+    
     if (spanSwitch.value) {
         total = 25 * 60;
     } else {
         total = 15 * 60;
     }
-    remain = 5 * 60;
-    
+    remain = 5 * 60;    
+};
+
+function initLabel() {
     count.text = date_format(total);
     qa.text = '　';
     qa.font = {fontSize: '70%', fontFamily: 'Expletus Sans'};
     contents.backgroundColor = '#000';
+};
+
+function timerClear(){
+    var start_time = new Date();
+    past_time = start_time;
     pause = 0;
 };
 
 clear.addEventListener('click', function (){
     timerClear();
+    initTotalandRemain(0);
+    initLabel();
 });
 
 start.addEventListener('click', function () {
     if (pause === 0) {
         timerClear();
+        initTotalandRemain(0);
+        initLabel();
     } else {
         var tmp_time = new Date();
         past_time = tmp_time;
@@ -168,6 +189,14 @@ stop.addEventListener('click', function () {
     pause = 1;
 });
 
+demo.addEventListener('click', function (){
+    timerClear();
+    initTotalandRemain(1);
+    initLabel();
+    pause = 0;
+    timer_id = setTimeout("update()", 300);
+});
+
 top.add(caption);
 contents.add(count);
 contents.add(qa);
@@ -176,6 +205,7 @@ toolview.add(start);
 toolview.add(stop);
 toolview.add(clear);
 toolview.add(spanSwitch);
+toolview.add(demo);
 footer.add(toolview);
 
 ground.add(top);
