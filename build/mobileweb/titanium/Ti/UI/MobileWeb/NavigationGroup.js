@@ -1,7 +1,227 @@
-define(["Ti/_/css","Ti/_/declare","Ti/UI/View","Ti/UI","Ti/_/lang"],function(g,m,n,e,o){var l=o.isDef,f=e.FILL;return m("Ti.UI.MobileWeb.NavigationGroup",n,{constructor:function(a){var a=this.constants.window=a&&a.window,b=this._navBarContainer=e.createView({height:50,width:e.FILL,layout:e._LAYOUT_CONSTRAINING_HORIZONTAL});g.add(b.domNode,"TiUINavigationGroup");this.layout=e._LAYOUT_CONSTRAINING_VERTICAL;b.add(this._leftContainer=Ti.UI.createView({width:e.SIZE,height:"100%",left:5,right:5}));b.add(this._centerContainer=
-Ti.UI.createView({width:e.FILL,height:"100%"}));b.add(this._rightContainer=Ti.UI.createView({width:e.SIZE,height:"100%",left:5,right:5}));this._add(b);this._add(this._contentContainer=e.createView({width:f,height:f}));this.navBarAtTop=!0;b._getBorderFromCSS();this._windows=[];a&&this.open(a)},_defaultWidth:f,_defaultHeight:f,_updateNavBar:function(){var a=this,b=a._windows,d=b.length,c=b[d-1],f=this._navBarContainer,g=a._leftContainer,i=a._centerContainer,j=a._rightContainer,h,k=c.rightNavButton;
-c.leftNavButton?h=c.leftNavButton:(a._backButton||(a._backButton=Ti.UI.createButton({title:"Back"}),require.on(a._backButton,"singletap",function(){a.close(b[b.length-1])})),1<d&&(h=a._backButton));g._children[0]!==h&&(g._removeAllChildren(),h&&g._add(h));j._children[0]!==k&&(j._removeAllChildren(),k&&j._add(k));f.backgroundColor=c.barColor;f.backgroundImage=c.barImage;f.opacity=c.translucent?0.5:1;f.height=c.navBarHidden&&c.modal?0:50;d=c.titleControl?c.titleControl:c.titleImage?c._titleImageView||
-(c._titleImageView=Ti.UI.createImageView({image:c.titleImage})):c._titleControl||(c._titleControl=Ti.UI.createLabel({text:c._getTitle()||this._tab&&this._tab._getTitle()||"",width:"100%",height:"100%",textAlign:e.TEXT_ALIGNMENT_CENTER}));i._children[0]!==d&&(i._removeAllChildren(),d&&i._add(d))},_getTopWindow:function(){var a=this._windows;return a.length?a[a.length-1]:null},open:function(a){if(!a._opened){var b=this._windows,d=this._tab;a._navGroup=this;!l(a.backgroundColor)&&!l(a.backgroundImage)&&
-(a.backgroundColor="#fff");~(b.length-1)&&b[b.length-1].fireEvent("blur");d&&(a.tabGroup=(a.tab=d)._tabGroup);b.push(a);this._contentContainer._add(a);this._updateNavBar();a._opened||a.fireEvent("open");a._opened=1;a.fireEvent("focus")}},close:function(a){var b=this._windows,d=b.indexOf(a);a._navGroup=void 0;0<d&&(b.splice(d,1),a.fireEvent("blur"),this._contentContainer.remove(a),a.fireEvent("close"),a._opened=0,this._updateNavBar(),b[b.length-1].fireEvent("focus"))},_reset:function(){var a=this._windows,
-b,d=a.length-1,c=d;for(this._backButton.animate({opacity:0,duration:250},function(){this.opacity=0;this.enabled=!1});;){b=a[d];if(!d)break;d--===c&&b.fireEvent("blur");this._contentContainer.remove(b);b.fireEvent("close");b._opened=0}a.splice(1);this._updateNavBar();b.fireEvent("focus")},constants:{window:void 0},properties:{navBarAtTop:{set:function(a,b){if(a!==b){var d=this._navBarContainer,c=d.domNode;this._remove(d);this._insertAt(d,a?0:1);g.remove(c,"TiUINavigationGroup"+(a?"Top":"Bottom"));
-g.add(c,"TiUINavigationGroup"+(a?"Bottom":"Top"))}return a}}}})});
+define(["Ti/_/css", "Ti/_/declare", "Ti/UI/View", "Ti/UI", "Ti/_/lang"],
+	function(css, declare, View, UI, lang) {
+		
+	var isDef = lang.isDef,
+		UI_FILL = UI.FILL,
+		navGroupCss = "TiUINavigationGroup";
+
+	return declare("Ti.UI.MobileWeb.NavigationGroup", View, {
+
+		constructor: function(args) {
+			var self = this,
+				win = self.constants.window = args && args.window,
+				tab = args && args._tab,
+				navBarContainer = self._navBarContainer = UI.createView({
+					height: 50,
+					width: UI.FILL,
+					layout: UI._LAYOUT_CONSTRAINING_HORIZONTAL
+				});
+			css.add(navBarContainer.domNode, navGroupCss);
+			self.layout = UI._LAYOUT_CONSTRAINING_VERTICAL;
+			
+			// Create the nav bar content
+			navBarContainer.add(self._leftContainer = Ti.UI.createView({
+				width: UI.SIZE,
+				height: "100%",
+				left: 5,
+				right: 5
+			}));
+			navBarContainer.add(self._centerContainer = Ti.UI.createView({
+				width: UI.FILL,
+				height: "100%"
+			}));
+			navBarContainer.add(self._rightContainer = Ti.UI.createView({
+				width: UI.SIZE,
+				height: "100%",
+				left: 5,
+				right: 5
+			}));
+			self._add(navBarContainer);
+
+			// Create the content container
+			self._add(self._contentContainer = UI.createView({
+				width: UI_FILL,
+				height: UI_FILL
+			}));
+			
+			// Stylize the top
+			this.navBarAtTop = true;
+			navBarContainer._getBorderFromCSS();
+			
+			// Initialize the window stack and add the root window
+			self._windows = [];
+			win && self.open(win);
+		},
+
+		_defaultWidth: UI_FILL,
+
+		_defaultHeight: UI_FILL,
+		
+		_updateNavBar: function() {
+			var _self = this,
+				windows = _self._windows,
+				len = windows.length,
+				activeWin = windows[len - 1],
+				navBarContainer = this._navBarContainer,
+				leftContainer = _self._leftContainer,
+				centerContainer = _self._centerContainer,
+				rightContainer = _self._rightContainer,
+				leftView,
+				centerView,
+				rightView = activeWin.rightNavButton;
+			
+			if (activeWin.leftNavButton) {
+				leftView = activeWin.leftNavButton;
+			} else {
+				if (!_self._backButton) {
+					_self._backButton = Ti.UI.createButton({
+						title: "Back"
+					});
+					require.on(_self._backButton, "singletap", function() {
+						// Note: we can reuse activeWin or length because they may have changed by the time this event 
+						// listener is called due to reuse of the back button across windows.
+						_self.close(windows[windows.length - 1]);
+					});
+				};
+				len > 1 && (leftView = _self._backButton);
+			}
+			if (leftContainer._children[0] !== leftView) {
+				leftContainer._removeAllChildren();
+				leftView && leftContainer._add(leftView);
+			}
+			
+			if (rightContainer._children[0] !== rightView) {
+				rightContainer._removeAllChildren();
+				rightView && rightContainer._add(rightView);
+			}
+			
+			navBarContainer.backgroundColor = activeWin.barColor;
+			navBarContainer.backgroundImage = activeWin.barImage;
+			navBarContainer.opacity = activeWin.translucent ? 0.5 : 1;
+			navBarContainer.height = activeWin.navBarHidden && activeWin.modal ? 0 : 50;
+			
+			if (activeWin.titleControl) {
+				centerView = activeWin.titleControl;
+			} else if (activeWin.titleImage) {
+				centerView = activeWin._titleImageView || (activeWin._titleImageView = Ti.UI.createImageView({
+					image: activeWin.titleImage
+				}));
+			} else {
+				centerView = activeWin._titleControl || (activeWin._titleControl = Ti.UI.createLabel({
+					text: activeWin._getTitle() || (this._tab && this._tab._getTitle()) || "",
+					width: "100%",
+					height: "100%",
+					textAlign: UI.TEXT_ALIGNMENT_CENTER
+				}));
+			}
+			if (centerContainer._children[0] !== centerView) {
+				centerContainer._removeAllChildren();
+				centerView && centerContainer._add(centerView);
+			}
+		},
+
+		_getTopWindow: function() {
+			var windows = this._windows,
+				len = windows.length;
+			return len ? windows[windows.length - 1] : null;
+		},
+
+		open: function(win) {
+			if (!win._opened) {
+				var backButton = this._backButton,
+					windows = this._windows,
+					tab = this._tab;
+				
+				win._navGroup = this;
+
+				// Set a default background
+				!isDef(win.backgroundColor) && !isDef(win.backgroundImage) && (win.backgroundColor = "#fff");
+
+				~(windows.length - 1) && windows[windows.length - 1].fireEvent("blur");
+
+				// Show the window
+				tab && (win.tabGroup = (win.tab = tab)._tabGroup);
+				windows.push(win);
+				this._contentContainer._add(win);
+				this._updateNavBar();
+				
+				win._opened || win.fireEvent("open");
+				win._opened = 1;
+				win.fireEvent("focus");
+			}
+		},
+
+		close: function(win) {
+			var windows = this._windows,
+				windowIdx = windows.indexOf(win),
+				self = this,
+				backButton = self._backButton;
+				
+			win._navGroup = void 0;
+
+			// make sure the window exists and it's not the root
+			if (windowIdx > 0) {
+				windows.splice(windowIdx, 1);
+				win.fireEvent("blur");
+				self._contentContainer.remove(win);
+				win.fireEvent("close");
+				win._opened = 0;
+
+				this._updateNavBar();
+				windows[windows.length - 1].fireEvent("focus");
+			}
+		},
+
+		_reset: function() {
+			var windows = this._windows,
+				win,
+				i = windows.length - 1,
+				l = i;
+
+			this._backButton.animate({opacity: 0, duration: 250}, function() {
+				this.opacity = 0;
+				this.enabled = false;
+			});
+
+			while (1) {
+				win = windows[i];
+				if (!i) {
+					break;
+				}
+				i-- === l && win.fireEvent("blur");
+				this._contentContainer.remove(win);
+				win.fireEvent("close");
+				win._opened = 0;
+			}
+
+			windows.splice(1);
+			this._updateNavBar();
+			win.fireEvent("focus");
+		},
+
+		constants: {
+			window: void 0
+		},
+
+		properties: {
+			navBarAtTop: {
+				set: function (value, oldValue) {
+					if (value !== oldValue) {
+						var navBarContainer = this._navBarContainer,
+							navBarContainerDomNode = navBarContainer.domNode;
+							
+						this._remove(navBarContainer);
+						this._insertAt(navBarContainer, value ? 0 : 1);
+						
+						css.remove(navBarContainerDomNode, navGroupCss + (value ? "Top" : "Bottom"));
+						css.add(navBarContainerDomNode, navGroupCss + (value ? "Bottom" : "Top"));
+					}
+
+					return value;
+				}
+			}
+		}
+
+	});
+
+});

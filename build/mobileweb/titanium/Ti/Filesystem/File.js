@@ -1,1 +1,7 @@
-define(["Ti/_/declare","Ti/_/Evented","Ti/_/Filesystem/Local","Ti/App/Properties"],function(b,c,d,a){a=a.getString("ti.fs.backend");return b("Ti.Filesystem.File",[c,a?require(a):d])});
+define(["Ti/_/declare", "Ti/_/Evented", "Ti/_/Filesystem/Local", "Ti/App/Properties"], function(declare, Evented, Local, Properties) {
+
+	var backend = Properties.getString("ti.fs.backend");
+
+	return declare("Ti.Filesystem.File", [Evented, backend ? require(backend) : Local]);
+
+});

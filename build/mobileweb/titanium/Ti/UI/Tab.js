@@ -1,4 +1,126 @@
-define("Ti/_/declare,Ti/UI/View,Ti/_/dom,Ti/Locale,Ti/UI,Ti/UI/MobileWeb".split(","),function(g,h,d,i,c,j){var d={post:function(){this._tabTitle.text=this._getTitle()}},f=c.FILL,e=c.SIZE;return g("Ti.UI.Tab",h,{constructor:function(a){var a=a&&a.window,b=c.createView({layout:c._LAYOUT_CONSTRAINING_VERTICAL,width:"100%",height:e}),k=this._tabNavigationGroup=j.createNavigationGroup({window:a,_tab:this});this._add(b);b._add(this._tabIcon=c.createImageView({height:e,width:e}));b._add(this._tabTitle=c.createLabel({width:"100%",
-wordWrap:!0,textAlign:c.TEXT_ALIGNMENT_CENTER}));a&&require.on(this,"singletap",this,function(){var a=this._tabGroup;a&&(a.activeTab===this?k._reset():a.activeTab=this)})},_defaultWidth:f,_defaultHeight:f,open:function(a,b){this._tabNavigationGroup.open(a,b)},close:function(a,b){this._tabNavigationGroup.close(a,b)},_focus:function(){this.fireEvent("focus",this._tabGroup._getEventData());var a=this._tabNavigationGroup._getTopWindow();a&&(this._tabGroup&&this._tabGroup._opened&&!a._opened&&(a._opened=
-1,a.fireEvent("open")),a._handleFocusEvent())},_blur:function(){var a=this._tabNavigationGroup._getTopWindow();a&&a._handleBlurEvent();this.fireEvent("blur",this._tabGroup._getEventData())},_getTitle:function(){return i._getString(this.titleid,this.title)},_setTabGroup:function(a){this._tabGroup=a;this._tabNavigationGroup.navBarAtTop=a.tabsAtTop;this._win&&(this._win.tabGroup=a)},_setNavBarAtTop:function(a){this._tabNavigationGroup.navBarAtTop=a},properties:{active:{get:function(){return this._tabGroup&&
-this._tabGroup.activeTab===this},post:function(a){var b=this._tabGroup,c=this._tabNavigationGroup,d=b._focused&&b._opened;a?(c.navBarAtTop=b.tabsAtBottom,c._updateNavBar(),b._addTabContents(c),d&&this._focus()):(b._removeTabContents(c),d&&this._blur())}},icon:{set:function(a){return this._tabIcon.image=a}},title:d,titleid:d}})});
+define(["Ti/_/declare", "Ti/UI/View", "Ti/_/dom", "Ti/Locale", "Ti/UI", "Ti/UI/MobileWeb"],
+	function(declare, View, dom, Locale, UI, MobileWeb) {
+
+	var postTitle = {
+			post: function() {
+				this._tabTitle.text = this._getTitle();
+			}
+		},
+		UI_FILL = UI.FILL,
+		UI_SIZE = UI.SIZE;
+
+	return declare("Ti.UI.Tab", View, {
+
+		constructor: function(args) {
+			var win = args && args.window,
+				container = UI.createView({
+					layout: UI._LAYOUT_CONSTRAINING_VERTICAL,
+					width: "100%",
+					height: UI_SIZE
+				}),
+				navGroup = this._tabNavigationGroup = MobileWeb.createNavigationGroup({ window: win, _tab: this });;
+
+			this._add(container);
+
+			container._add(this._tabIcon = UI.createImageView({
+				height: UI_SIZE,
+				width: UI_SIZE
+			}));
+
+			container._add(this._tabTitle = UI.createLabel({
+				width: "100%",
+				wordWrap: true,
+				textAlign: UI.TEXT_ALIGNMENT_CENTER
+			}));
+
+			win && require.on(this, "singletap", this, function(e) {
+				var tabGroup = this._tabGroup;
+				if (tabGroup) {
+					if (tabGroup.activeTab === this) {
+						navGroup._reset();
+					} else {
+						tabGroup.activeTab = this;
+					}
+				}
+			});
+		},
+
+		_defaultWidth: UI_FILL,
+
+		_defaultHeight: UI_FILL,
+
+		open: function(win, options) {
+			this._tabNavigationGroup.open(win, options);
+		},
+
+		close: function(win, options) {
+			this._tabNavigationGroup.close(win, options);
+		},
+
+		_focus: function() {
+			this.fireEvent("focus", this._tabGroup._getEventData());
+			var win = this._tabNavigationGroup._getTopWindow();
+			if (win) {
+				if (this._tabGroup && this._tabGroup._opened && !win._opened) {
+					win._opened = 1;
+					win.fireEvent("open");
+				}
+				win._handleFocusEvent();
+			}
+		},
+
+		_blur: function() {
+			var win = this._tabNavigationGroup._getTopWindow();
+			win && win._handleBlurEvent();
+			this.fireEvent("blur", this._tabGroup._getEventData());
+		},
+
+		_getTitle: function() {
+			return Locale._getString(this.titleid, this.title);
+		},
+
+		_setTabGroup: function(tabGroup) {
+			this._tabGroup = tabGroup;
+			this._tabNavigationGroup.navBarAtTop = tabGroup.tabsAtTop;
+			this._win && (this._win.tabGroup = tabGroup);
+		},
+
+		_setNavBarAtTop: function(value) {
+			this._tabNavigationGroup.navBarAtTop = value;
+		},
+
+		properties: {
+			active: {
+				get: function() {
+					return this._tabGroup && this._tabGroup.activeTab === this;
+				},
+				post: function(value) {
+					var tabGroup = this._tabGroup,
+						navGroup = this._tabNavigationGroup,
+						doEvents = tabGroup._focused && tabGroup._opened;
+					if (value) {
+						navGroup.navBarAtTop = tabGroup.tabsAtBottom;
+						navGroup._updateNavBar();
+						tabGroup._addTabContents(navGroup);
+						doEvents && this._focus();
+					} else {
+						tabGroup._removeTabContents(navGroup);
+						doEvents && this._blur();
+					}
+				}
+			},
+
+			icon: {
+				set: function(value) {
+					return this._tabIcon.image = value;
+				}
+			},
+
+			title: postTitle,
+
+			titleid: postTitle
+		}
+
+	});
+
+});

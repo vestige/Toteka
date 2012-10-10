@@ -1,6 +1,151 @@
-define("Ti/_/declare,Ti/_/UI/Widget,Ti/_/dom,Ti/_/css,Ti/_/style,Ti/_/lang,Ti/Locale,Ti/UI".split(","),function(h,i,a,c,d,k,j,b){var e=require.on,g=d.set,a={post:function(){this.backgroundColor||this.backgroundDisabledColor||this.backgroundDisabledImage||this.backgroundFocusedColor||this.backgroundFocusedImage||this.backgroundImage||this.backgroundSelectedColor||this.backgroundSelectedImage?this._clearDefaultLook():this._setDefaultLook();this._doBackground()}},d={post:function(){this._buttonTitle.text=
-j._getString(this.titleid,this.title);this._hasSizeDimensions()&&this._triggerLayout()}};return h("Ti.UI.Button",i,{constructor:function(){var f=this._contentContainer=b.createView({width:b.INHERIT,height:b.INHERIT,layout:b._LAYOUT_CONSTRAINING_HORIZONTAL,borderColor:"transparent"}),a=this.domNode;this._add(f);f._add(this._buttonImage=b.createImageView());f._add(this._buttonTitle=b.createLabel({textAlign:b.TEXT_ALIGNMENT_CENTER,verticalAlign:b.TEXT_VERTICAL_ALIGNMENT_CENTER,width:b.INHERIT,height:b.INHERIT}));
-this._setDefaultLook();e(this,"touchstart",this,function(){c.remove(a,"TiUIElementGradient");c.add(a,"TiUIElementGradientActive");this.selectedColor&&(this._buttonTitle.color=this.selectedColor)});e(this,"touchend",this,function(){c.remove(a,"TiUIElementGradientActive");c.add(a,"TiUIElementGradient");this.selectedColor&&(this._buttonTitle.color=this.color||"#000")});e(a,"mouseout",this,function(){this.selectedColor&&(this._buttonTitle.color=this.color||"#000")})},_defaultWidth:b.SIZE,_defaultHeight:b.SIZE,
-_setDefaultLook:function(){this._hasDefaultLook||(this._hasDefaultLook=!0,this._previousBorderWidth=this.borderWidth,this._previousBorderColor=this.borderColor,c.add(this.domNode,"TiUIElementGradient"),c.add(this.domNode,"TiUIButtonDefault"),this._contentContainer.borderWidth=6,this._getBorderFromCSS())},_clearDefaultLook:function(){this._hasDefaultLook&&(this._hasDefaultLook=!1,this.borderWidth=this._previousBorderWidth,this.borderColor=this._previousBorderColor,c.remove(this.domNode,"TiUIElementGradient"),
-c.remove(this.domNode,"TiUIButtonDefault"),this._contentContainer.borderWidth=0)},properties:{backgroundColor:a,backgroundDisabledColor:a,backgroundDisabledImage:a,backgroundFocusedColor:a,backgroundFocusedImage:a,backgroundImage:a,backgroundSelectedColor:a,backgroundSelectedImage:a,enabled:{set:function(a,b){a!==b&&(this._hasDefaultLook&&(a?(c.add(this.domNode,"TiUIElementGradient"),g(this.domNode,"backgroundColor","")):(c.remove(this.domNode,"TiUIElementGradient"),g(this.domNode,"backgroundColor",
-"#aaa"))),this._setTouchEnabled(a));return a},value:!0},image:{set:function(a){return this._buttonImage.image=a}},selectedColor:void 0,textAlign:{set:function(a){return this._buttonTitle.textAlign=a}},title:d,titleid:d,verticalAlign:{set:function(a){return this._buttonTitle.verticalAlign=a}}}})});
+define(["Ti/_/declare", "Ti/_/UI/Widget", "Ti/_/dom", "Ti/_/css", "Ti/_/style", "Ti/_/lang", "Ti/Locale", "Ti/UI"],
+	function(declare, Widget, dom, css, style, lang, Locale, UI) {
+
+	var on = require.on,
+		setStyle = style.set,
+		postDoBackground = {
+			post: function() {
+				if (this.backgroundColor || this.backgroundDisabledColor || this.backgroundDisabledImage || this.backgroundFocusedColor || 
+					this.backgroundFocusedImage || this.backgroundImage || this.backgroundSelectedColor || this.backgroundSelectedImage) {
+					this._clearDefaultLook();
+				} else {
+					this._setDefaultLook();
+				}
+				this._doBackground();
+			}
+		},
+		titlePost = {
+			post: function() {
+				this._buttonTitle.text = Locale._getString(this.titleid, this.title);
+				this._hasSizeDimensions() && this._triggerLayout();
+			}
+		};
+
+	return declare("Ti.UI.Button", Widget, {
+
+		constructor: function() {
+			var contentContainer = this._contentContainer = UI.createView({
+					width: UI.INHERIT,
+					height: UI.INHERIT,
+					layout: UI._LAYOUT_CONSTRAINING_HORIZONTAL,
+					borderColor: "transparent"
+				}),
+				node = this.domNode;
+
+			this._add(contentContainer);
+
+			contentContainer._add(this._buttonImage = UI.createImageView());
+			contentContainer._add(this._buttonTitle = UI.createLabel({
+				textAlign: UI.TEXT_ALIGNMENT_CENTER,
+				verticalAlign: UI.TEXT_VERTICAL_ALIGNMENT_CENTER,
+				width: UI.INHERIT,
+				height: UI.INHERIT
+			}));
+
+			this._setDefaultLook();
+
+			on(this, "touchstart", this, function() {
+				css.remove(node, "TiUIElementGradient");
+				css.add(node, "TiUIElementGradientActive");
+				this.selectedColor && (this._buttonTitle.color = this.selectedColor);
+			});
+			on(this, "touchend", this, function() {
+				css.remove(node, "TiUIElementGradientActive");
+				css.add(node, "TiUIElementGradient");
+				this.selectedColor && (this._buttonTitle.color = this.color || "#000");
+			});
+			on(node, "mouseout", this, function() {
+				this.selectedColor && (this._buttonTitle.color = this.color || "#000");
+			});
+		},
+
+		_defaultWidth: UI.SIZE,
+
+		_defaultHeight: UI.SIZE,
+		
+		_setDefaultLook: function() {
+			if (!this._hasDefaultLook) {
+				this._hasDefaultLook = true;
+				this._previousBorderWidth = this.borderWidth;
+				this._previousBorderColor = this.borderColor;
+				css.add(this.domNode, "TiUIElementGradient");
+				css.add(this.domNode, "TiUIButtonDefault");
+				this._contentContainer.borderWidth = 6;
+				this._getBorderFromCSS();
+			}
+		},
+		
+		_clearDefaultLook: function() {
+			if (this._hasDefaultLook) {
+				this._hasDefaultLook = false;
+				this.borderWidth = this._previousBorderWidth;
+				this.borderColor = this._previousBorderColor;
+				css.remove(this.domNode, "TiUIElementGradient");
+				css.remove(this.domNode, "TiUIButtonDefault");
+				this._contentContainer.borderWidth = 0;
+			}
+		},
+
+		properties: {
+			
+			// Override the default background info so we can hook into it
+			backgroundColor: postDoBackground,
+
+			backgroundDisabledColor: postDoBackground,
+
+			backgroundDisabledImage: postDoBackground,
+
+			backgroundFocusedColor: postDoBackground,
+
+			backgroundFocusedImage: postDoBackground,
+
+			backgroundImage: postDoBackground,
+
+			backgroundSelectedColor: postDoBackground,
+
+			backgroundSelectedImage: postDoBackground,
+			
+			enabled: {
+				set: function(value, oldValue) {
+					
+					if (value !== oldValue) {
+						if (this._hasDefaultLook) {	
+							if (!value) {
+								css.remove(this.domNode,"TiUIElementGradient");
+								setStyle(this.domNode,"backgroundColor","#aaa");
+							} else {
+								css.add(this.domNode,"TiUIElementGradient");
+								setStyle(this.domNode,"backgroundColor","");
+							}
+						}
+						this._setTouchEnabled(value);
+					}
+					return value;
+				},
+				value: true
+			},
+			
+			image: {
+				set: function(value) {
+					this._buttonImage.image = value;
+					return value;
+				}
+			},
+			selectedColor: void 0,
+			textAlign: {
+				set: function(value) {
+					return this._buttonTitle.textAlign = value;
+				}
+			},
+			title: titlePost,
+			titleid: titlePost,
+			verticalAlign: {
+				set: function(value) {
+					return this._buttonTitle.verticalAlign = value;
+				}
+			}
+		}
+
+	});
+
+});

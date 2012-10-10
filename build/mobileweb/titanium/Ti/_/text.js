@@ -1,1 +1,33 @@
-define(function(){var e={};return{dynamic:!0,normalize:function(b,a){var c=b.split("!"),d=c[0];c.shift();return(/^\./.test(d)?a(d):d)+(c.length?"!"+c.join("!"):"")},load:function(b,a,c){b=a.toUrl(b);a=e[b]||a.cache(b);if(!a)if(a=new XMLHttpRequest,a.open("GET",b,!1),a.send(null),200===a.status)a=a.responseText;else throw Error('Failed to load text "'+b+'": '+a.status);c(a)}}});
+define(function() {
+	var cache = {};
+
+	return {
+		dynamic: true, // prevent the loader from caching the result
+
+		normalize: function(name, normalize) {
+			var parts = name.split("!"),
+				url = parts[0];
+			parts.shift();
+			return (/^\./.test(url) ? normalize(url) : url) + (parts.length ? "!" + parts.join("!") : "");
+		},
+
+		load: function(name, require, onLoad, config) {
+			var x,
+				url = require.toUrl(name),
+				c = cache[url] || require.cache(url);
+
+			if (!c) {
+				x = new XMLHttpRequest();
+				x.open("GET", url, false);
+				x.send(null);
+				if (x.status === 200) {
+					c = x.responseText;
+				} else {
+					throw new Error("Failed to load text \"" + url + "\": " + x.status);
+				}
+			}
+
+			onLoad(c);
+		}
+	};
+});

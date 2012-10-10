@@ -1,11 +1,433 @@
-define(["Ti/_/Layouts/Base","Ti/_/declare","Ti/UI","Ti/_/lang","Ti/_/style"],function(y,z,o,A){var s=A.isDef,u=Math.round;return z("Ti._.Layouts.ConstrainingVertical",y,{_doLayout:function(c,e,b,t,h){var k={width:0,height:0},r=c._children,a,j=0,d,n,f,p,l,i,q=[],m=0;l=0;var g=r.length;i=this._measureNode;for(j=0;j<g;j++)a=c._children[j],!a._alive||!a.domNode?this.handleInvalidState(a,c):a._markedForLayout&&((a._preLayout&&a._preLayout(e,b,t,h)||a._needsMeasuring)&&i(a,a,a._layoutCoefficients,this),
-d=a._layoutCoefficients,f=d.height,0===f.x2||isNaN(f.x2)?(n=d.width,p=d.sandboxHeight,d=n.x1*e+n.x2,f=f.x1*b+f.x2*(b-m)+f.x3,n=a._getContentSize?a._getContentSize(d,f):a._layout._doLayout(a,isNaN(d)?e:d-a._borderLeftWidth-a._borderRightWidth,isNaN(f)?b:f-a._borderTopWidth-a._borderBottomWidth,isNaN(d),isNaN(f)),isNaN(d)&&(d=n.width+a._borderLeftWidth+a._borderRightWidth),isNaN(f)&&(f=n.height+a._borderTopWidth+a._borderBottomWidth),p=a._measuredSandboxHeight=p.x1*b+p.x2+f,m+=p,a._measuredWidth=d,
-a._measuredHeight=f):l++);h=b-m;m=Math.floor(h/l);for(j=0;j<g;j++)a=c._children[j],a._markedForLayout&&(d=a._layoutCoefficients,f=d.height,0!==f.x2&&!isNaN(f.x2)&&(n=d.width,p=d.sandboxHeight,d=n.x1*e+n.x2,f=f.x1*b+f.x2*(j<g-1?m:h-m*(l-1))+f.x3,n=a._getContentSize?a._getContentSize(d,f):a._layout._doLayout(a,isNaN(d)?e:d-a._borderLeftWidth-a._borderRightWidth,isNaN(f)?b:f-a._borderTopWidth-a._borderBottomWidth,isNaN(d),isNaN(f)),isNaN(d)&&(d=n.width+a._borderLeftWidth+a._borderRightWidth),isNaN(f)&&
-(f=n.height+a._borderTopWidth+a._borderBottomWidth),a._measuredWidth=d,a._measuredHeight=f,a._measuredSandboxHeight=p.x1*b+p.x2+f));for(j=m=0;j<g;j++)a=c._children[j],a._measuredRunningHeight=m,a._markedForLayout&&(d=a._layoutCoefficients,h=d.sandboxWidth,l=d.top,i=d.left,t&&0!==i.x1?q.push(a):(d=a._measuredWidth,i=a._measuredLeft=i.x1*e+i.x2*d+i.x3,h=a._measuredSandboxWidth=h.x1*e+h.x2+d+(isNaN(i)?0:i),h>k.width&&(k.width=h)),a._measuredTop=l.x1*b+l.x2+m),m+=a._measuredSandboxHeight;k.height=m;g=
-q.length;for(j=0;j<g;j++)a=q[j],h=a._layoutCoefficients.sandboxWidth,h=a._measuredSandboxWidth=h.x1*e+h.x2+a._measuredWidth,h>k.width&&(k.width=h);for(j=0;j<g;j++)a=q[j],i=a._layoutCoefficients.left,d=a._measuredWidth,h=a._measuredSandboxWidth,h>k.width&&(k.width=h),i=a._measuredLeft=i.x1*k.width+i.x2*d+i.x3,a._measuredSandboxWidth+=isNaN(i)?0:i;g=r.length;for(j=0;j<g;j++)a=r[j],a._markedForLayout&&(o._elementLayoutCount++,a=r[j],c=a.domNode.style,c.zIndex=a.zIndex,c.left=u(a._measuredLeft)+"px",
-c.top=u(a._measuredTop)+"px",c.width=u(a._measuredWidth-a._borderLeftWidth-a._borderRightWidth)+"px",c.height=u(a._measuredHeight-a._borderTopWidth-a._borderBottomWidth)+"px",a._markedForLayout=!1,a.fireEvent("postlayout"));return this._computedSize=k},_getWidth:function(c,e){!s(e)&&2>s(c.left)+s(c.center&&c.center.x)+s(c.right)&&(e=c._defaultWidth);return e===o.INHERIT?c._parent._parent?c._parent._parent._layout._getWidth(c._parent,c._parent.width)===o.SIZE?o.SIZE:o.FILL:o.FILL:e},_getHeight:function(c,
-e){!s(e)&&(e=c._defaultHeight);return e===o.INHERIT?c._parent._parent?c._parent._parent._layout._getHeight(c._parent,c._parent.height)===o.SIZE?o.SIZE:o.FILL:o.FILL:e},_isDependentOnParent:function(c){c=c._layoutCoefficients;return!isNaN(c.width.x1)&&0!==c.width.x1||!isNaN(c.height.x1)&&0!==c.height.x1||!isNaN(c.height.x2)&&0!==c.height.x2||0!==c.sandboxWidth.x1||0!==c.sandboxHeight.x1||0!==c.left.x1||0!==c.top.x1},_doAnimationLayout:function(c,e){var b=c._parent._measuredWidth,o=c._parent._measuredHeight,
-h=c._measuredRunningHeight,k=e.width.x1*b+e.width.x2;return{width:k,height:e.height.x1*o+e.height.x2*(o-h)+e.height.x3,left:e.left.x1*b+e.left.x2*k+e.left.x3,top:e.top.x1*o+e.top.x2+h}},_measureNode:function(c,e,b,t){c._needsMeasuring=!1;var h=t.getValueType,k=t.computeValue,r=t._getWidth(c,e.width),a=h(r),r=k(r,a),j=t._getHeight(c,e.height),c=h(j),j=k(j,c),d=e.left,n=h(d),d=k(d,n),f=e.center&&e.center.x,p=h(f),f=k(f,p),l=e.right,i=h(l),l=k(l,i),q=e.top,m=h(q),q=k(q,m),e=e.bottom,h=h(e),k=k(e,h),
-g,s=b.width,e=b.height,u=b.sandboxWidth,w=b.sandboxHeight,v=b.left,x=b.top,b=g=0;a===o.SIZE?b=g=NaN:a===o.FILL?(b=1,"%"===n?b-=d:"#"===n?g=-d:"%"===i?b-=l:"#"===i&&(g=-l)):"%"===a?b=r:"#"===a?g=r:"%"===n?"%"===p?b=2*(f-d):"#"===p?(b=-2*d,g=2*f):"%"===i?b=1-d-l:"#"===i&&(b=1-d,g=-l):"#"===n?"%"===p?(b=2*f,g=-2*d):"#"===p?g=2*(f-d):"%"===i?(b=1-l,g=-d):"#"===i&&(b=1,g=-l-d):"%"===p?"%"===i?b=2*(l-f):"#"===i&&(b=-2*f,g=2*l):"#"===p&&("%"===i?(b=2*l,g=-2*f):"#"===i&&(g=2*(l-f)));s.x1=b;s.x2=g;u.x1="%"===
-i?l:0;u.x2="#"===i?l:0;b=g=a=0;c===o.SIZE?b=g=a=NaN:c===o.FILL?(g=1,"%"===m&&(b=-q),"#"===m&&(a=-q),"%"===h&&(b=-k),"#"===h&&(a=-k)):"%"===c?b=j:"#"===c&&(a=j);e.x1=b;e.x2=g;e.x3=a;b=g=0;"%"===m&&(b=q);"#"===m&&(g=q);"%"===h&&(b+=k);"#"===h&&(g+=k);w.x1=b;w.x2=g;b=g=a=0;if("%"===n)b=d;else if("#"===n)a=d;else if("%"===p)b=f,g=-0.5;else if("#"===p)g=-0.5,a=f;else if("%"===i)b=1-l,g=-1;else if("#"===i)b=1,g=-1,a=-l;else switch(t._defaultHorizontalAlignment){case "center":b=0.5;g=-0.5;break;case "end":b=
-1,g=-1}v.x1=b;v.x2=g;v.x3=a;x.x1="%"===m?q:0;x.x2="#"===m?q:0},_defaultHorizontalAlignment:"center",_defaultVerticalAlignment:"start"})});
+define(["Ti/_/Layouts/Base", "Ti/_/declare", "Ti/UI", "Ti/_/lang", "Ti/_/style"], function(Base, declare, UI, lang, style) {
+	
+	var isDef = lang.isDef,
+		setStyle = style.set,
+		round = Math.round;
+
+	return declare("Ti._.Layouts.ConstrainingVertical", Base, {
+
+		_doLayout: function(element, width, height, isWidthSize, isHeightSize) {
+			var computedSize = {width: 0, height: 0},
+				children = element._children,
+				child,
+				i = 0,
+				layoutCoefficients, 
+				widthLayoutCoefficients, heightLayoutCoefficients, sandboxWidthLayoutCoefficients, sandboxHeightLayoutCoefficients, topLayoutCoefficients, leftLayoutCoefficients, 
+				childSize,
+				measuredWidth, measuredHeight, measuredSandboxHeight, measuredSandboxWidth, measuredLeft, measuredTop,
+				pixelUnits = "px",
+				deferredPositionCalculations = [],
+				deferredLeftCalculations = [],
+				runningHeight = 0,
+				remainingSpace,
+				fillCount = 0,
+				len = children.length,
+				verifyChild = this.verifyChild,
+				updateBorder = this.updateBorder,
+				measureNode = this._measureNode,
+				style;
+				
+			// Calculate size for the non-FILL children
+			for(i = 0; i < len; i++) {
+				
+				child = element._children[i];
+				if (!child._alive || !child.domNode) {
+					this.handleInvalidState(child,element);
+				} else {
+					
+					if (child._markedForLayout) {
+						((child._preLayout && child._preLayout(width, height, isWidthSize, isHeightSize)) || child._needsMeasuring) && measureNode(child, child, child._layoutCoefficients, this);
+									
+						layoutCoefficients = child._layoutCoefficients;
+						heightLayoutCoefficients = layoutCoefficients.height;
+						
+						if (heightLayoutCoefficients.x2 === 0 || isNaN(heightLayoutCoefficients.x2)) {
+							widthLayoutCoefficients = layoutCoefficients.width;
+							sandboxWidthLayoutCoefficients = layoutCoefficients.sandboxWidth;
+							sandboxHeightLayoutCoefficients = layoutCoefficients.sandboxHeight;
+							
+							measuredWidth = widthLayoutCoefficients.x1 * width + widthLayoutCoefficients.x2;
+							measuredHeight = heightLayoutCoefficients.x1 * height + heightLayoutCoefficients.x2 * (height - runningHeight) + heightLayoutCoefficients.x3;
+							
+							if (child._getContentSize) {
+								childSize = child._getContentSize(measuredWidth, measuredHeight);
+							} else {
+								childSize = child._layout._doLayout(
+									child, 
+									isNaN(measuredWidth) ? width : measuredWidth - child._borderLeftWidth - child._borderRightWidth, 
+									isNaN(measuredHeight) ? height : measuredHeight - child._borderTopWidth - child._borderBottomWidth, 
+									isNaN(measuredWidth), 
+									isNaN(measuredHeight));
+							}
+							isNaN(measuredWidth) && (measuredWidth = childSize.width + child._borderLeftWidth + child._borderRightWidth);
+							isNaN(measuredHeight) && (measuredHeight = childSize.height + child._borderTopWidth + child._borderBottomWidth);
+							
+							measuredSandboxHeight = child._measuredSandboxHeight = sandboxHeightLayoutCoefficients.x1 * height + sandboxHeightLayoutCoefficients.x2 + measuredHeight;
+							
+							runningHeight += measuredSandboxHeight;
+							
+							child._measuredWidth = measuredWidth;
+							child._measuredHeight = measuredHeight;
+						} else {
+							fillCount++;
+						}
+					}
+				}
+			}
+			
+			// Calculate size for the FILL children
+			remainingSpace = height - runningHeight;
+			runningHeight = Math.floor(remainingSpace / fillCount); // Temporary repurposing of runningHeight
+			for(i = 0; i < len; i++) {
+				
+				child = element._children[i];
+				
+				if (child._markedForLayout) {
+								
+					layoutCoefficients = child._layoutCoefficients;
+					heightLayoutCoefficients = layoutCoefficients.height;
+					
+					if (heightLayoutCoefficients.x2 !== 0 && !isNaN(heightLayoutCoefficients.x2)) {
+						widthLayoutCoefficients = layoutCoefficients.width;
+						sandboxWidthLayoutCoefficients = layoutCoefficients.sandboxWidth;
+						sandboxHeightLayoutCoefficients = layoutCoefficients.sandboxHeight;
+						
+						measuredWidth = widthLayoutCoefficients.x1 * width + widthLayoutCoefficients.x2;
+						measuredHeight = heightLayoutCoefficients.x1 * height + heightLayoutCoefficients.x2 * (i < len - 1 ? runningHeight : remainingSpace - runningHeight * (fillCount - 1)) + heightLayoutCoefficients.x3;
+						
+						if (child._getContentSize) {
+							childSize = child._getContentSize(measuredWidth, measuredHeight);
+						} else {
+							childSize = child._layout._doLayout(
+								child, 
+								isNaN(measuredWidth) ? width : measuredWidth - child._borderLeftWidth - child._borderRightWidth, 
+								isNaN(measuredHeight) ? height : measuredHeight - child._borderTopWidth - child._borderBottomWidth, 
+								isNaN(measuredWidth), 
+								isNaN(measuredHeight));
+						}
+						isNaN(measuredWidth) && (measuredWidth = childSize.width + child._borderLeftWidth + child._borderRightWidth);
+						isNaN(measuredHeight) && (measuredHeight = childSize.height + child._borderTopWidth + child._borderBottomWidth);
+						child._measuredWidth = measuredWidth;
+						child._measuredHeight = measuredHeight;
+						
+						measuredSandboxHeight = child._measuredSandboxHeight = sandboxHeightLayoutCoefficients.x1 * height + sandboxHeightLayoutCoefficients.x2 + measuredHeight;
+					}
+				}
+			}
+			
+			// Calculate position for the children
+			runningHeight = 0
+			for(i = 0; i < len; i++) {
+				
+				child = element._children[i];
+				child._measuredRunningHeight = runningHeight;
+				if (child._markedForLayout) {
+					layoutCoefficients = child._layoutCoefficients;
+					sandboxWidthLayoutCoefficients = layoutCoefficients.sandboxWidth;
+					topLayoutCoefficients = layoutCoefficients.top;
+					leftLayoutCoefficients = layoutCoefficients.left;
+					
+					if (isWidthSize && leftLayoutCoefficients.x1 !== 0) {
+						deferredLeftCalculations.push(child);
+					} else {
+						measuredWidth = child._measuredWidth;
+						
+						measuredLeft = child._measuredLeft = leftLayoutCoefficients.x1 * width + leftLayoutCoefficients.x2 * measuredWidth + leftLayoutCoefficients.x3;
+						measuredSandboxWidth = child._measuredSandboxWidth = sandboxWidthLayoutCoefficients.x1 * width + sandboxWidthLayoutCoefficients.x2 + measuredWidth + (isNaN(measuredLeft) ? 0 : measuredLeft);
+						measuredSandboxWidth > computedSize.width && (computedSize.width = measuredSandboxWidth);
+					}
+					measuredTop = child._measuredTop = topLayoutCoefficients.x1 * height + topLayoutCoefficients.x2 + runningHeight;
+				}
+				runningHeight += child._measuredSandboxHeight;
+			}
+			computedSize.height = runningHeight;
+			
+			// Calculate the preliminary sandbox widths (missing left, since one of these widths may end up impacting all the lefts)
+			len = deferredLeftCalculations.length;
+			for(i = 0; i < len; i++) {
+				child = deferredLeftCalculations[i];
+				sandboxWidthLayoutCoefficients = child._layoutCoefficients.sandboxWidth;
+				measuredSandboxWidth = child._measuredSandboxWidth = sandboxWidthLayoutCoefficients.x1 * width + sandboxWidthLayoutCoefficients.x2 + child._measuredWidth;
+				measuredSandboxWidth > computedSize.width && (computedSize.width = measuredSandboxWidth);
+			}
+			
+			// Second pass, if necessary, to determine the left values
+			for(i = 0; i < len; i++) {
+				child = deferredLeftCalculations[i];
+				
+				leftLayoutCoefficients = child._layoutCoefficients.left;
+				sandboxWidthLayoutCoefficients = child._layoutCoefficients.sandboxWidth;
+				measuredWidth = child._measuredWidth;
+				measuredSandboxWidth = child._measuredSandboxWidth;
+				
+				measuredSandboxWidth > computedSize.width && (computedSize.width = measuredSandboxWidth);
+				measuredLeft = child._measuredLeft = leftLayoutCoefficients.x1 * computedSize.width + leftLayoutCoefficients.x2 * measuredWidth + leftLayoutCoefficients.x3;
+				child._measuredSandboxWidth += (isNaN(measuredLeft) ? 0 : measuredLeft);
+			}
+			
+			// Position the children
+			len = children.length;
+			for(i = 0; i < len; i++) {
+				child = children[i];
+				if (child._markedForLayout) {
+					UI._elementLayoutCount++;
+					child = children[i];
+					style = child.domNode.style;
+					style.zIndex = child.zIndex;
+					style.left = round(child._measuredLeft) + pixelUnits;
+					style.top = round(child._measuredTop) + pixelUnits;
+					style.width = round(child._measuredWidth - child._borderLeftWidth - child._borderRightWidth) + pixelUnits;
+					style.height = round(child._measuredHeight - child._borderTopWidth - child._borderBottomWidth) + pixelUnits;
+					child._markedForLayout = false;
+					child.fireEvent("postlayout");
+				}
+			}
+			
+			return this._computedSize = computedSize;
+		},
+		
+		_getWidth: function(node, width) {
+			
+			// Get the width or default width, depending on which one is needed
+			!isDef(width) && (isDef(node.left) + isDef(node.center && node.center.x) + isDef(node.right) < 2) && (width = node._defaultWidth);
+			
+			// Check if the width is INHERIT, and if so fetch the inherited width
+			if (width === UI.INHERIT) {
+				if (node._parent._parent) {
+					return node._parent._parent._layout._getWidth(node._parent, node._parent.width) === UI.SIZE ? UI.SIZE : UI.FILL;
+				}
+				// This is the root level content container, which we know has a width of FILL
+				return UI.FILL;
+			}
+			return width;
+		},
+		
+		_getHeight: function(node, height) {
+			
+			// Get the height or default height, depending on which one is needed
+			!isDef(height) && (height = node._defaultHeight);
+			
+			// Check if the width is INHERIT, and if so fetch the inherited width
+			if (height === UI.INHERIT) {
+				if (node._parent._parent) {
+					return node._parent._parent._layout._getHeight(node._parent, node._parent.height) === UI.SIZE ? UI.SIZE : UI.FILL;
+				}
+				// This is the root level content container, which we know has a width of FILL
+				return UI.FILL;
+			}
+			return height;
+		},
+		
+		_isDependentOnParent: function(node){
+			var layoutCoefficients = node._layoutCoefficients;
+			return (!isNaN(layoutCoefficients.width.x1) && layoutCoefficients.width.x1 !== 0) || // width
+				(!isNaN(layoutCoefficients.height.x1) && layoutCoefficients.height.x1 !== 0) ||
+				(!isNaN(layoutCoefficients.height.x2) && layoutCoefficients.height.x2 !== 0) || // height
+				layoutCoefficients.sandboxWidth.x1 !== 0 || // sandbox width
+				layoutCoefficients.sandboxHeight.x1 !== 0 || // sandbox height
+				layoutCoefficients.left.x1 !== 0 || // left
+				layoutCoefficients.top.x1 !== 0; // top
+		},
+		
+		_doAnimationLayout: function(node, animationCoefficients) {
+			
+			var parentWidth = node._parent._measuredWidth,
+				parentHeight = node._parent._measuredHeight,
+				nodeWidth = node._measuredWidth,
+				nodeHeight = node._measuredHeight,
+				runningHeight = node._measuredRunningHeight,
+				width = animationCoefficients.width.x1 * parentWidth + animationCoefficients.width.x2;
+			
+			return {
+				width: width,
+				height: animationCoefficients.height.x1 * parentHeight + animationCoefficients.height.x2 * (parentHeight - runningHeight) + animationCoefficients.height.x3,
+				left: animationCoefficients.left.x1 * parentWidth + animationCoefficients.left.x2 * width + animationCoefficients.left.x3,
+				top: animationCoefficients.top.x1 * parentHeight + animationCoefficients.top.x2 + runningHeight
+			}
+		},
+		
+		_measureNode: function(node, layoutProperties, layoutCoefficients, self) {
+			
+			node._needsMeasuring = false;
+			
+			// Pre-processing
+			var getValueType = self.getValueType,
+				computeValue = self.computeValue,
+			
+				width = self._getWidth(node, layoutProperties.width),
+				widthType = getValueType(width),
+				widthValue = computeValue(width, widthType),
+				
+				height = self._getHeight(node, layoutProperties.height),
+				heightType = getValueType(height),
+				heightValue = computeValue(height, heightType),
+				
+				left = layoutProperties.left,
+				leftType = getValueType(left),
+				leftValue = computeValue(left, leftType),
+				
+				centerX = layoutProperties.center && layoutProperties.center.x,
+				centerXType = getValueType(centerX),
+				centerXValue = computeValue(centerX, centerXType),
+				
+				right = layoutProperties.right,
+				rightType = getValueType(right),
+				rightValue = computeValue(right, rightType),
+				
+				top = layoutProperties.top,
+				topType = getValueType(top),
+				topValue = computeValue(top, topType),
+				
+				bottom = layoutProperties.bottom,
+				bottomType = getValueType(bottom),
+				bottomValue = computeValue(bottom, bottomType),
+				
+				x1, x2, x3,
+				
+				widthLayoutCoefficients = layoutCoefficients.width,
+				heightLayoutCoefficients = layoutCoefficients.height,
+				sandboxWidthLayoutCoefficients = layoutCoefficients.sandboxWidth,
+				sandboxHeightLayoutCoefficients = layoutCoefficients.sandboxHeight,
+				leftLayoutCoefficients = layoutCoefficients.left,
+				topLayoutCoefficients = layoutCoefficients.top;
+			
+			// Width rule evaluation
+			x1 = x2 = 0;
+			if (widthType === UI.SIZE) {
+				x1 = x2 = NaN;
+			} else if (widthType === UI.FILL) {
+				x1 = 1;
+				if (leftType === "%") {
+					x1 -= leftValue;
+				} else if (leftType === "#") {
+					x2 = -leftValue;
+				} else if (rightType === "%") {
+					x1 -= rightValue;
+				} else if (rightType === "#") {
+					x2 = -rightValue;
+				}
+			} else if (widthType === "%") {
+				x1 = widthValue;
+			} else if (widthType === "#") {
+				x2 = widthValue;
+			} else if (leftType === "%") {
+				if (centerXType === "%") {
+					x1 = 2 * (centerXValue - leftValue);
+				} else if (centerXType === "#") {
+					x1 = -2 * leftValue;
+					x2 = 2 * centerXValue;
+				} else if (rightType === "%") {
+					x1 = 1 - leftValue - rightValue;
+				} else if (rightType === "#") {
+					x1 = 1 - leftValue;
+					x2 = -rightValue;
+				}
+			} else if (leftType === "#") {
+				if (centerXType === "%") {
+					x1 = 2 * centerXValue;
+					x2 = -2 * leftValue;
+				} else if (centerXType === "#") {
+					x2 = 2 * (centerXValue - leftValue);
+				} else if (rightType === "%") {
+					x1 = 1 - rightValue;
+					x2 = -leftValue;
+				} else if (rightType === "#") {
+					x1 = 1;
+					x2 = -rightValue - leftValue;
+				}
+			} else if (centerXType === "%") {
+				if (rightType === "%") {
+					x1 = 2 * (rightValue - centerXValue);
+				} else if (rightType === "#") {
+					x1 = -2 * centerXValue;
+					x2 = 2 * rightValue;
+				}
+			} else if (centerXType === "#") {
+				if (rightType === "%") {
+					x1 = 2 * rightValue;
+					x2 = -2 * centerXValue;
+				} else if (rightType === "#") {
+					x2 = 2 * (rightValue - centerXValue);
+				}
+			}
+			widthLayoutCoefficients.x1 = x1;
+			widthLayoutCoefficients.x2 = x2;
+			
+			// Sandbox width rule evaluation
+			sandboxWidthLayoutCoefficients.x1 = rightType === "%" ? rightValue : 0;
+			sandboxWidthLayoutCoefficients.x2 = rightType === "#" ? rightValue : 0;
+			
+			// Height rule calculation
+			x1 = x2 = x3 = 0;
+			if (heightType === UI.SIZE) {
+				x1 = x2 = x3 = NaN;
+			} else if (heightType === UI.FILL) {
+				x2 = 1;
+				topType === "%" && (x1 = -topValue);
+				topType === "#" && (x3 = -topValue);
+				bottomType === "%" && (x1 = -bottomValue);
+				bottomType === "#" && (x3 = -bottomValue);
+			} else if (heightType === "%") {
+				x1 = heightValue;
+			} else if (heightType === "#") {
+				x3 = heightValue;
+			}
+			heightLayoutCoefficients.x1 = x1;
+			heightLayoutCoefficients.x2 = x2;
+			heightLayoutCoefficients.x3 = x3;
+			
+			// Sandbox height rule calculation
+			x1 = x2 = 0;
+			topType === "%" && (x1 = topValue);
+			topType === "#" && (x2 = topValue);
+			bottomType === "%" && (x1 += bottomValue);
+			bottomType === "#" && (x2 += bottomValue);
+			sandboxHeightLayoutCoefficients.x1 = x1;
+			sandboxHeightLayoutCoefficients.x2 = x2;
+			
+			// Left rule calculation
+			x1 = x2 = x3 = 0;
+			if (leftType === "%") {
+				x1 = leftValue;
+			} else if(leftType === "#") {
+				x3 = leftValue;
+			} else if (centerXType === "%") {
+				x1 = centerXValue;
+				x2 = -0.5;
+			} else if (centerXType === "#") {
+				x2 = -0.5;
+				x3 = centerXValue;
+			} else if (rightType === "%") {
+				x1 = 1 - rightValue;
+				x2 = -1;
+			} else if (rightType === "#") {
+				x1 = 1;
+				x2 = -1;
+				x3 = -rightValue;
+			} else { 
+				switch(self._defaultHorizontalAlignment) {
+					case "center": 
+						x1 = 0.5;
+						x2 = -0.5;
+						break;
+					case "end":
+						x1 = 1;
+						x2 = -1;
+				}
+			}
+			leftLayoutCoefficients.x1 = x1;
+			leftLayoutCoefficients.x2 = x2;
+			leftLayoutCoefficients.x3 = x3;
+			
+			// Top rule calculation
+			topLayoutCoefficients.x1 = topType === "%" ? topValue : 0;
+			topLayoutCoefficients.x2 = topType === "#" ? topValue : 0;
+		},
+		
+		_defaultHorizontalAlignment: "center",
+		
+		_defaultVerticalAlignment: "start"
+
+	});
+
+});

@@ -1,4 +1,160 @@
-define(["Ti/_","Ti/API","Ti/_/style"],function(h,j,k){var g=require.is,l={innerHTML:1,className:1,value:1},m={classname:"class",htmlfor:"for",tabindex:"tabIndex",readonly:"readOnly"},n={"class":"className","for":"htmlFor",tabindex:"tabIndex",readonly:"readOnly",colspan:"colSpan",frameborder:"frameBorder",rowspan:"rowSpan",valuetype:"valueType"},i={set:function(a,b,c){if(2===arguments.length){for(var d in b)i.set(a,d,b[d]);return a}d=b.toLowerCase();var e=n[d]||b,f=l[e];if("style"===e&&!require.is(c,
-"String"))return k.set(a,c);if(f||g(c,"Boolean")||g(c,"Function"))return a[b]=c,a;a.setAttribute(m[d]||b,c);return a},remove:function(a,b){a.removeAttribute(b);return a}};return{create:function(a,b,c,d){var e=c?c.ownerDocument:document;g(a,"String")&&(a=e.createElement(a));b&&i.set(a,b);c&&this.place(a,c,d);return a},attr:i,place:function(a,b){b.appendChild(a);return a},detach:function(a){return a.parentNode&&a.parentNode.removeChild(a)},destroy:function(a){try{var b=a.ownerDocument.createElement("div");
-b.appendChild(this.detach(a)||a);b.innerHTML=""}catch(c){}},calculateDistance:function(a,b,c,d){return Math.sqrt(Math.pow(a-c,2)+Math.pow(b-d,2))},unitize:function(a){return isNaN(a-0)||a-0!=a?a:a+"px"},computeSize:function(a,b,c){if(g(a,"Number")&&isNaN(a))return 0;var d=require.is(a);if("String"===d)if(d=require("Ti/UI"),a===d.SIZE)c&&(a=void 0);else{var e=parseFloat(a),f=a.match(/.*(%|mm|cm|em|pt|in|px|dp)$/),f=f?f[1]:"px";switch(f){case "%":if(b==d.SIZE)c?void 0:d.SIZE;else if(!require.is(b,"Number")){j.error("Could not compute percentage size/position of element.");
-return}return e/100*b;case "mm":e/=10;case "cm":return 0.393700787*e*h.dpi;case "em":case "pt":e/=12;case "pc":e/=6;case "in":return e*h.dpi;case "px":return e;case "dp":return e*h.dpi/96}}else"Number"!==d&&(a=void 0);return a}}});
+/**
+ * create(), attr(), place(), & remove() functionality based on code from Dojo Toolkit.
+ *
+ * Dojo Toolkit
+ * Copyright (c) 2005-2011, The Dojo Foundation
+ * New BSD License
+ * <http://dojotoolkit.org>
+ */
+
+define(["Ti/_", "Ti/API", "Ti/_/style"], function(_, API, style) {
+	var is = require.is,
+		forcePropNames = {
+			innerHTML:	1,
+			className:	1,
+			value:		1
+		},
+		attrNames = {
+			// original attribute names
+			classname: "class",
+			htmlfor: "for",
+			// for IE
+			tabindex: "tabIndex",
+			readonly: "readOnly"
+		},
+		names = {
+			// properties renamed to avoid clashes with reserved words
+			"class": "className",
+			"for": "htmlFor",
+			// properties written as camelCase
+			tabindex: "tabIndex",
+			readonly: "readOnly",
+			colspan: "colSpan",
+			frameborder: "frameBorder",
+			rowspan: "rowSpan",
+			valuetype: "valueType"
+		},
+		attr = {
+			set: function(node, name, value) {
+				if (arguments.length === 2) {
+					// the object form of setter: the 2nd argument is a dictionary
+					for (var x in name) {
+						attr.set(node, x, name[x]);
+					}
+					return node;
+				}
+
+				var lc = name.toLowerCase(),
+					propName = names[lc] || name,
+					forceProp = forcePropNames[propName],
+					attrId, h;
+
+				if (propName === "style" && !require.is(value, "String")) {
+					return style.set(node, value);
+				}
+
+				if (forceProp || is(value, "Boolean") || is(value, "Function")) {
+					node[name] = value;
+					return node;
+				}
+
+				// node's attribute
+				node.setAttribute(attrNames[lc] || name, value);
+				return node;
+			},
+			remove: function(node, name) {
+				node.removeAttribute(name);
+				return node;
+			}
+		};
+
+	return {
+		create: function(tag, attrs, refNode, pos) {
+			var doc = refNode ? refNode.ownerDocument : document;
+			is(tag, "String") && (tag = doc.createElement(tag));
+			attrs && attr.set(tag, attrs);
+			refNode && this.place(tag, refNode, pos);
+			return tag;
+		},
+
+		attr: attr,
+
+		place: function(node, refNode, pos) {
+			refNode.appendChild(node);
+			return node;
+		},
+
+		detach: function(node) {
+			return node.parentNode && node.parentNode.removeChild(node);
+		},
+
+		destroy: function(node) {
+			try {
+				var destroyContainer = node.ownerDocument.createElement("div");
+				destroyContainer.appendChild(this.detach(node) || node);
+				destroyContainer.innerHTML = "";
+			} catch(e) {
+				/* squelch */
+			}
+		},
+
+		calculateDistance: function(ax, ay, bx, by) {
+			return Math.sqrt(Math.pow(ax - bx,2) + Math.pow(ay - by, 2));
+		},
+
+		unitize: function(x) {
+			return isNaN(x-0) || x-0 != x ? x : x + "px"; // note: must be != and not !==
+		},
+
+		computeSize: function(x, totalLength, convertSizeToUndef) {
+			if (is(x,"Number") && isNaN(x)) {
+				return 0;
+			}
+			var type = require.is(x);
+			if (type === "String") {
+				var UI = require("Ti/UI");
+				if (x === UI.SIZE) {
+					convertSizeToUndef && (x = void 0);
+				} else {
+					var value = parseFloat(x),
+						units = x.match(/.*(%|mm|cm|em|pt|in|px|dp)$/);
+					if (units) {
+						units = units[1];
+					} else {
+						units = "px";
+					}
+
+					switch(units) {
+						case "%":
+							if(totalLength == UI.SIZE) {
+								convertSizeToUndef ? void 0 : UI.SIZE;
+							} else if (!require.is(totalLength,"Number")) {
+								API.error("Could not compute percentage size/position of element.");
+								return;
+							} 
+							return value / 100 * totalLength;
+						case "mm":
+							value /= 10;
+						case "cm":
+							return value * 0.393700787 * _.dpi;
+						case "em":
+						case "pt":
+							value /= 12;
+						case "pc":
+							value /= 6;
+						case "in":
+							return value * _.dpi;
+						case "px":
+							return value;
+						case "dp":
+							return value * _.dpi / 96;
+					}
+				}
+			} else if (type !== "Number") {
+				x = void 0;
+			}
+
+			return x;
+		}
+	};
+});

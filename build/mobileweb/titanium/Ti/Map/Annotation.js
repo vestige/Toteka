@@ -1,2 +1,51 @@
-define(["Ti/_/declare","Ti/_/Evented","Ti/Locale"],function(e,f,d){var a={post:function(a,b,c){this.fireEvent("update",{property:c,value:a,oldValue:b})}};return e("Ti.Map.Annotation",f,{_onclick:function(a,b,c){this.fireEvent("click",{annotation:this,clicksource:c,index:b,map:a,title:this.title})},_update:function(){},_getTitle:function(){return d._getString(this.titleid,this.title)},_getSubtitle:function(){return d._getString(this.subtitleid,this.subtitle)},properties:{animate:!1,image:a,latitude:a,
-longitude:a,leftButton:a,pincolor:a,rightButton:a,subtitle:a,subtitleid:a,title:a,titleid:a}})});
+define(["Ti/_/declare", "Ti/_/Evented", "Ti/Locale"], function(declare, Evented, Locale) {
+
+	var updateHook = {
+		post: function(newValue, oldValue, prop) {
+			this.fireEvent("update", {
+				property: prop,
+				value: newValue,
+				oldValue: oldValue
+			});
+		}
+	};
+
+	return declare("Ti.Map.Annotation", Evented, {
+
+		_onclick: function(mapview, idx, src) {
+			this.fireEvent("click", {
+				annotation: this,
+				clicksource: src,
+				index: idx,
+				map: mapview,
+				title: this.title
+			});
+		},
+
+		_update: function() {},
+
+		_getTitle: function() {
+			return Locale._getString(this.titleid, this.title);
+		},
+
+		_getSubtitle: function() {
+			return Locale._getString(this.subtitleid, this.subtitle);
+		},
+
+		properties: {
+			animate: false,
+			image: updateHook,
+			latitude: updateHook,
+			longitude: updateHook,
+			leftButton: updateHook,
+			pincolor: updateHook,
+			rightButton: updateHook,
+			subtitle: updateHook,
+			subtitleid: updateHook,
+			title: updateHook,
+			titleid: updateHook
+		}
+
+	});
+
+});

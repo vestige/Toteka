@@ -1,3 +1,96 @@
-define(["Ti/_/declare","Ti/_/Evented","Ti/_/lang","Ti/Platform"],function(h,i,j,k){function f(a,b,c){var e=0==b?1:0,b=2==b?1:2,d=0==a?1:0,a=2==a?1:2;return c[d][e]*c[a][b]-c[d][b]*c[a][e]}function g(a,b,c,e,d,f,g,h){return{a:a.a*b+a.b*e,b:a.a*c+a.b*d,c:a.c*b+a.d*e,d:a.c*c+a.d*d,tx:a.a*f+a.b*g+a.tx,ty:a.c*f+a.d*g+a.ty,rotation:a.rotation+(h|0)}}var l="gecko"===k.runtime,d;return d=h("Ti.UI.2DMatrix",i,{properties:{a:1,b:0,c:0,d:1,tx:0,ty:0,rotation:0},constructor:function(a){a&&require.mix(this,a)},
-invert:function(){var a=0,b=0,c=[[this.a,this.b,this.tx],[this.c,this.d,this.ty],[0,0,1]],e=this.a*f(0,0,c)-this.b*f(0,1,c)+this.tx*f(0,2,c);if(1.0E-10<Math.abs(e))for(e=1/e;3>b;b++)for(;3>a;a++)c[b][a]=f(a,b,c)*e,1==(a+b)%2&&(c[b][a]=-c[b][a]);return new d(g(this,c[0][0],c[0][1],c[1][0],c[1][1],c[0][2],c[1][2]))},multiply:function(a){return new d(g(this,a.a,a.b,a.c,a.d,a.tx,a.ty,a.rotation))},rotate:function(a){return new d({a:this.a,b:this.b,c:this.c,d:this.d,tx:this.tx,ty:this.ty,rotation:this.rotation+
-a})},scale:function(a,b){return new d(g(this,a,0,0,j.val(b,a),0,0))},translate:function(a,b){return new d(g(this,1,0,0,1,a,b))},toCSS:function(){for(var a=0,b=[this.a,this.b,this.c,this.d,this.tx,this.ty];6>a;a++)b[a]=b[a].toFixed(6),4<a&&(b[a]=l?b[a]+"px":b[a]);return"matrix("+b.join(",")+") rotate("+this.rotation+"deg)"}})});
+define(["Ti/_/declare", "Ti/_/Evented", "Ti/_/lang", "Ti/Platform"],
+	function(declare, Evented, lang, Platform) {
+
+	var isFF = Platform.runtime === "gecko",
+		api,
+		px = function(x) {
+			return isFF ? x + "px" : x;
+		};
+
+	function detMinor(y, x, m) {
+		var x1 = x == 0 ? 1 : 0,
+			x2 = x == 2 ? 1 : 2,
+			y1 = y == 0 ? 1 : 0,
+			y2 = y == 2 ? 1 : 2;
+		return (m[y1][x1] * m[y2][x2]) - (m[y1][x2] * m[y2][x1]);
+	}
+
+	function mult(obj, a, b, c, d, tx, ty, r) {
+		return {
+			a: obj.a * a + obj.b * c,
+			b: obj.a * b + obj.b * d,
+			c: obj.c * a + obj.d * c,
+			d: obj.c * b + obj.d * d,
+			tx: obj.a * tx + obj.b * ty + obj.tx,
+			ty: obj.c * tx + obj.d * ty + obj.ty,
+			rotation: obj.rotation + (r | 0)
+		};
+	}
+
+	return api = declare("Ti.UI.2DMatrix", Evented, {
+
+		properties: {
+			a: 1,
+			b: 0,
+			c: 0,
+			d: 1,
+			tx: 0,
+			ty: 0,
+			rotation: 0
+		},
+
+		constructor: function(matrix) {
+			matrix && require.mix(this, matrix);
+		},
+
+		invert: function() {
+			var x = 0,
+				y = 0,
+				m = [[this.a, this.b, this.tx], [this.c, this.d, this.ty], [0, 0, 1]],
+				n = m,
+				det = this.a * detMinor(0, 0, m) - this.b * detMinor(0, 1, m) + this.tx * detMinor(0, 2, m);
+
+			if (Math.abs(det) > 1e-10) {
+				det = 1.0 / det;
+				for (; y < 3; y++) {
+					for (; x < 3; x++) {
+						n[y][x] = detMinor(x, y, m) * det;
+						(x + y) % 2 == 1 && (n[y][x] = -n[y][x]);
+					}
+				}
+			}
+
+			return new api(mult(this, n[0][0], n[0][1], n[1][0], n[1][1], n[0][2], n[1][2]));
+		},
+
+		multiply: function(other) {
+			return new api(mult(this, other.a, other.b, other.c, other.d, other.tx, other.ty, other.rotation));
+		},
+
+		rotate: function(angle) {
+			return new api({ a: this.a, b: this.b, c: this.c, d: this.d, tx: this.tx, ty: this.ty, rotation: this.rotation + angle });
+		},
+
+		scale: function(x, y) {
+			return new api(mult(this, x, 0, 0, lang.val(y, x), 0, 0));
+		},
+
+		translate: function(x, y) {
+			return new api(mult(this, 1, 0, 0, 1, x, y));
+		},
+
+		toCSS: function() {
+			var i = 0,
+				v = [this.a, this.b, this.c, this.d, this.tx, this.ty];
+	
+			for (; i < 6; i++) {
+				v[i] = v[i].toFixed(6);
+				i > 4 && (v[i] = px(v[i]));
+			}
+
+			return "matrix(" + v.join(",") + ") rotate(" + this.rotation + "deg)";
+		}
+
+	});
+
+});

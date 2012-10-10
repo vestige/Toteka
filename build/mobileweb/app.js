@@ -1,7 +1,7 @@
 Titanium.UI.setBackgroundColor('#000');
 
 WebFontConfig = {
-    google: { families: [ 'Montserrat+Subrayada::latin', 'Ewert::latin'] }
+    google: { families: [ 'Expletus+Sans::latin'] }
 };
 (function() {
     var wf = document.createElement('script');
@@ -26,7 +26,7 @@ var caption = Ti.UI.createLabel({
     textAlign: 'center',
     color: '#ddd',
     width: '100%',
-    font:{fontSize: '100%', fontFamily: 'Montserrat Subrayada'},
+    font:{fontSize: '100%', fontFamily: 'Expletus Sans'},
 })
 
 var contents = Ti.UI.createView({
@@ -35,18 +35,18 @@ var contents = Ti.UI.createView({
     layout: 'vertical',
 });
 
-var qa = Ti.UI.createLabel({
-    text: '',
-    color: 'white',
-    top: 10,
-    font:{fontSize: '70%', fontFamily:'Ewert'},		
-});
-
 var count = Ti.UI.createLabel({
     text: '00:00',
-    color: '#444',
-    top: 30,
-    font:{fontSize: '250%', fontFamily: 'sans-serif'},
+    color: '#99ff99',
+    top: 80,
+    font:{fontSize: '250%'},
+});
+
+var qa = Ti.UI.createLabel({
+    text: '　',
+    color: 'white',
+    top: 5,
+    font:{fontSize: '70%', fontFamily:'Expletus Sans'},		
 });
 
 var footer = Ti.UI.createView({
@@ -107,7 +107,7 @@ function update () {
         counting -= 1;
         if (counting < 0) {
             qa.color = '#FFFF00';
-            qa.font = {fontSize: '100%', fontFamily:'Ewert'};
+            qa.font = {fontSize: '120%', fontFamily: 'Expletus Sans'};
             qa.text = 'Finish!';
             count.text = "88888888";
             stop.fireEvent('click');
@@ -139,9 +139,10 @@ function timerClear(){
         counting = 15 * 60;
     }
     remain = 5 * 60;
-
+    
     count.text = date_format(counting);
-    qa.text = '';
+    qa.text = '　';
+    qa.font = {fontSize: '70%', fontFamily: 'Expletus Sans'};
     contents.backgroundColor = '#000';
     pause = 0;
 };
@@ -167,8 +168,8 @@ stop.addEventListener('click', function () {
 });
 
 top.add(caption);
-contents.add(qa);
 contents.add(count);
+contents.add(qa);
 
 toolview.add(start);
 toolview.add(stop);

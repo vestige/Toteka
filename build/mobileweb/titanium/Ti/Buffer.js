@@ -1,3 +1,98 @@
-define(["Ti/_/declare","Ti/_/Evented","Ti/Blob","Ti/Codec"],function(g,h,i,e){var f;return f=g("Ti.Buffer",h,{constructor:function(a){a&&a.value&&this._set(a.value)},append:function(a,b){var c=a.value;b|=0;length=length||c.length;this._set(this.value+c.substring(b,b+length));return length-b},clear:function(){this._set("")},clone:function(a,b){return new f({value:a?this.value.substring(a,b&&a+b):this.value})},copy:function(a,b,c,d){a=a.value;b|=0;c|=0;d=Math.max(this.length,d&&c+d)-b;a=a.substring(c,
-d);this._set(this.value.substring(0,b)+a+this.value.substring(b,a.length-b))},fill:function(a,b,c){if(!a)throw Error("Missing fillByte argument");b|=0;c=this.length-b-c|0;this._set(this.value.substring(0,b|0)+Array(c).join((a+" ").charAt(0))+this.value.substring(c))},insert:function(a,b,c,d){c|=0;b|=0;this._set(this.value.substring(0,b)+v.substring(c,d&&c+d)+this.value.substring(b));return d||v.length},release:function(){this.length=0},toBlob:function(){return new i({data:this.value})},toString:function(){return""+
-this.value},_set:function(a){this.constants.__values__.value=""+a},_resize:function(a,b){a|=0;this._set(this.value.substring(a,b&&a+b|0))},constants:{byteOrder:e.LITTLE_ENDIAN,type:e.CHARSET_UTF8,value:""},properties:{length:{get:function(){return this.value.length},set:function(a,b){a<b?this._resize(0,a):this.constants.__values__.value+=Array(a-b).join(" ");return a}}}})});
+define(["Ti/_/declare", "Ti/_/Evented", "Ti/Blob", "Ti/Codec"], function(declare, Evented, Blob, Codec) {
+
+	var Buffer;
+
+	return Buffer = declare("Ti.Buffer", Evented, {
+
+		constructor: function(args) {
+			args && args.value && this._set(args.value);
+		},
+
+		append: function(buffer, offset, len) {
+			var v = buffer.value;
+			offset = offset | 0,
+			length = length || v.length;
+			this._set(this.value + v.substring(offset, offset + length));
+			return length - offset;
+		},
+
+		clear: function() {
+			this._set("");
+		},
+
+		clone: function(offset, length) {
+			return new Buffer({ value: offset ? this.value.substring(offset, length && offset + length) : this.value });
+		},
+
+		copy: function(srcBuffer, offset, srcOffset, srcLength) {
+			var v = srcBuffer.value,
+				offset = offset | 0,
+				srcOffset = srcOffset | 0,
+				len = Math.max(this.length, srcLength && srcOffset + srcLength) - offset,
+				srcBuffer = v.substring(srcOffset, len);
+			this._set(this.value.substring(0, offset) + srcBuffer + this.value.substring(offset, srcBuffer.length - offset));
+		},
+
+		fill: function(fillByte, offset, length) {
+			if (!fillByte) {
+				throw new Error("Missing fillByte argument");
+			}
+			offset = offset | 0;
+			length = this.length - offset - length | 0;
+			this._set(this.value.substring(0, offset | 0) + (new Array(length)).join((fillByte + ' ').charAt(0)) + this.value.substring(length));
+		},
+
+		insert: function(buffer, offset, srcOffset, srcLength) {
+			var b = buffer.value;
+			srcOffset = srcOffset | 0;
+			offset = offset | 0;
+			this._set(this.value.substring(0, offset) + v.substring(srcOffset, srcLength && srcOffset + srcLength) + this.value.substring(offset));
+			return srcLength || v.length;
+		},
+
+		release: function() {
+			this.length = 0;
+		},
+
+		toBlob: function() {
+			return new Blob({ data: this.value });
+		},
+
+		toString: function() {
+			return ""+this.value;
+		},
+
+		_set: function(value) {
+			this.constants.__values__.value = ""+value;
+		},
+
+		_resize: function(offset, length) {
+			offset = offset | 0;
+			this._set(this.value.substring(offset, length && (offset + length | 0)));
+		},
+
+		constants: {
+			byteOrder: Codec.LITTLE_ENDIAN,
+			type: Codec.CHARSET_UTF8,
+			value: ""
+		},
+
+		properties: {
+			length: {
+				get: function() {
+					return this.value.length;
+				},
+				set: function(newValue, oldValue) {
+					if (newValue < oldValue) {
+						this._resize(0, newValue);
+					} else {
+						this.constants.__values__.value += (new Array(newValue - oldValue)).join(' ');
+					}
+					return newValue;
+				}
+			}
+		}
+
+	});
+
+});

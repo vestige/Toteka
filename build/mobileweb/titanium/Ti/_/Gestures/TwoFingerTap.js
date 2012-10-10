@@ -1,6 +1,133 @@
-define(["Ti/_/declare","Ti/_/lang","Ti/_/Gestures/GestureRecognizer"],function(h,g,i){return h("Ti._.Gestures.TwoFingerTap",i,{name:"twofingertap",_touchStartLocation:null,_touchEndLocation:null,_fingerDifferenceThresholdTimer:null,_fingerDifferenceThreshold:100,_driftThreshold:25,processTouchStartEvent:function(a){var e=a.changedTouches[0].clientX,b=a.changedTouches[0].clientY,c=a.touches.length,d=a.changedTouches.length;1==c&&1==d?(this._touchStartLocation=[{x:e,y:b}],this._fingerDifferenceThresholdTimer=
-setTimeout(g.hitch(this,function(){this._touchStartLocation=null}),this._fingerDifferenceThreshold)):2==c&&1==d?(clearTimeout(this._fingerDifferenceThresholdTimer),this._touchStartLocation&&this._touchStartLocation.push({x:e,y:b})):this._touchStartLocation=2==c&&2==d?[{x:e,y:b},{x:a.changedTouches[1].clientX,y:a.changedTouches[1].clientY}]:null},processTouchEndEvent:function(a,e){var b=a.changedTouches[0].clientX,c=a.changedTouches[0].clientY,d=a.touches.length,f=a.changedTouches.length;if(1==d&&
-1==f)this._touchEndLocation=[{x:b,y:c}],this._fingerDifferenceThresholdTimer=setTimeout(g.hitch(this,function(){this._touchStartLocation=null}),this._fingerDifferenceThreshold);else if(0==d&&(1==f||2==f)){if(this._touchStartLocation&&2===this._touchStartLocation.length){this._touchEndLocation||(this._touchEndLocation=[]);for(d=0;d<f;d++)this._touchEndLocation.push({x:b,y:c});if(2===this._touchEndLocation.length){b=Math.abs(this._touchStartLocation[0].x-this._touchEndLocation[0].x)<this._driftThreshold&&
-Math.abs(this._touchStartLocation[0].y-this._touchEndLocation[0].y)<this._driftThreshold;c=Math.abs(this._touchStartLocation[1].x-this._touchEndLocation[1].x)<this._driftThreshold&&Math.abs(this._touchStartLocation[1].y-this._touchEndLocation[1].y)<this._driftThreshold;if(!b||!c)b=Math.abs(this._touchStartLocation[0].x-this._touchEndLocation[1].x)<this._driftThreshold&&Math.abs(this._touchStartLocation[0].y-this._touchEndLocation[1].y)<this._driftThreshold,c=Math.abs(this._touchStartLocation[1].x-
-this._touchEndLocation[0].x)<this._driftThreshold&&Math.abs(this._touchStartLocation[1].y-this._touchEndLocation[0].y)<this._driftThreshold;b&&c&&!e._isGestureBlocked(this.name)&&(this.blocking.push("singletap"),this.blocking.push("doubletap"),this.blocking.push("longpress"),e._handleTouchEvent(this.name,{x:(this._touchStartLocation[0].x+this._touchStartLocation[1].x)/2,y:(this._touchStartLocation[0].y+this._touchStartLocation[1].y)/2}))}this._touchStartLocation=null}}else this._touchStartLocation=
-null},finalizeTouchEndEvent:function(){this.blocking=[]},processTouchCancelEvent:function(){this._touchStartLocation=null}})});
+define(["Ti/_/declare", "Ti/_/lang","Ti/_/Gestures/GestureRecognizer"], function(declare,lang,GestureRecognizer) {
+
+	return declare("Ti._.Gestures.TwoFingerTap", GestureRecognizer, {
+		
+		name: "twofingertap",
+		
+		_touchStartLocation: null,
+		_touchEndLocation: null,
+		_fingerDifferenceThresholdTimer: null,
+		
+		// There are two possibilities: the user puts down two fingers at exactly the same time,
+		// which is almost impossible, or they put one finger down first, followed by the second.
+		// For the second case, we need ensure that the two taps were intended to be at the same time.
+		// This value defines the maximum time difference before this is considered some other type of gesture.
+		_fingerDifferenceThreshold: 100,
+		
+		// This is the amount of space the fingers are allowed drift until the gesture is no longer considered a two finger tap
+		_driftThreshold: 25,
+		
+		processTouchStartEvent: function(e, element){
+			
+			var x = e.changedTouches[0].clientX,
+				y = e.changedTouches[0].clientY,
+				touchesLength = e.touches.length,
+				changedTouchesLength = e.changedTouches.length;
+			
+			// First finger down of the two, given a slight difference in contact time
+			if (touchesLength == 1 && changedTouchesLength == 1) {
+				this._touchStartLocation = [{
+					x: x,
+					y: y
+				}];
+				this._fingerDifferenceThresholdTimer = setTimeout(lang.hitch(this,function(){
+					this._touchStartLocation = null;
+				}),this._fingerDifferenceThreshold);
+			
+			// Second finger down of the two, given a slight difference in contact time
+			} else if (touchesLength == 2 && changedTouchesLength == 1) {
+				clearTimeout(this._fingerDifferenceThresholdTimer);
+				if (this._touchStartLocation) {
+					this._touchStartLocation.push({
+						x: x,
+						y: y
+					});
+				}
+				
+			// Two fingers down at the same time
+			} else if (touchesLength == 2 && changedTouchesLength == 2) {
+				this._touchStartLocation = [{
+					x: x,
+					y: y
+				},
+				{
+					x: e.changedTouches[1].clientX,
+					y: e.changedTouches[1].clientY
+				}];
+				
+			// Something else, means it's not a two finger tap
+			} else {
+				this._touchStartLocation = null;
+			}
+		},
+		
+		processTouchEndEvent: function(e, element){
+			
+			var x = e.changedTouches[0].clientX,
+				y = e.changedTouches[0].clientY,
+				touchesLength = e.touches.length,
+				changedTouchesLength = e.changedTouches.length;
+			
+			// One finger was lifted off, one remains
+			if (touchesLength == 1 && changedTouchesLength == 1) {
+				this._touchEndLocation = [{
+					x: x,
+					y: y
+				}];
+				this._fingerDifferenceThresholdTimer = setTimeout(lang.hitch(this,function(){
+					this._touchStartLocation = null;
+				}),this._fingerDifferenceThreshold);
+				
+			// Second or both fingers lifted off
+			} else if (touchesLength == 0 && (changedTouchesLength == 1 || changedTouchesLength == 2)) {
+				if (this._touchStartLocation && this._touchStartLocation.length === 2) {
+					this._touchEndLocation || (this._touchEndLocation = []);
+					for(var i = 0; i < changedTouchesLength; i++) {
+						this._touchEndLocation.push({
+							x: x,
+							y: y
+						});
+					}
+					if (this._touchEndLocation.length === 2) {
+						var distance1OK = Math.abs(this._touchStartLocation[0].x - this._touchEndLocation[0].x) < this._driftThreshold && 
+								Math.abs(this._touchStartLocation[0].y - this._touchEndLocation[0].y) < this._driftThreshold,
+							distance2OK = Math.abs(this._touchStartLocation[1].x - this._touchEndLocation[1].x) < this._driftThreshold && 
+								Math.abs(this._touchStartLocation[1].y - this._touchEndLocation[1].y) < this._driftThreshold;
+						// Check if the end points are swapped from the start points
+						if (!distance1OK || !distance2OK) {
+							distance1OK = Math.abs(this._touchStartLocation[0].x - this._touchEndLocation[1].x) < this._driftThreshold && 
+								Math.abs(this._touchStartLocation[0].y - this._touchEndLocation[1].y) < this._driftThreshold;
+							distance2OK = Math.abs(this._touchStartLocation[1].x - this._touchEndLocation[0].x) < this._driftThreshold && 
+								Math.abs(this._touchStartLocation[1].y - this._touchEndLocation[0].y) < this._driftThreshold;
+						}
+						if (distance1OK && distance2OK && !element._isGestureBlocked(this.name)) {
+							this.blocking.push("singletap");
+							this.blocking.push("doubletap");
+							this.blocking.push("longpress");
+							element._handleTouchEvent(this.name,{
+								x: (this._touchStartLocation[0].x + this._touchStartLocation[1].x) / 2,
+								y: (this._touchStartLocation[0].y + this._touchStartLocation[1].y) / 2
+							});
+						}
+					}
+					this._touchStartLocation = null;
+				}
+				
+			// Something else, means it's not a two finger tap
+			} else {
+				this._touchStartLocation = null;
+			}
+			
+			
+		},
+		finalizeTouchEndEvent: function(){
+			this.blocking = [];
+		},
+		
+		processTouchCancelEvent: function(e, element){
+			this._touchStartLocation = null;
+		}
+		
+	});
+	
+});

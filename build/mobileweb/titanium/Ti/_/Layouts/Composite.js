@@ -1,11 +1,447 @@
-define(["Ti/_/Layouts/Base","Ti/_/declare","Ti/UI","Ti/_/lang"],function(I,J,m,K){var l=K.isDef,E=Math.round;return J("Ti._.Layouts.Composite",I,{_doLayout:function(c,e,h,H,i){for(var g={width:0,height:0},n=c._children,b,f=0,j,a,d,k,t,r,u,x,y,v,w,l=[],C=[],z=n.length,G=this._measureNode,f=0;f<z;f++)b=c._children[f],!b._alive||!b.domNode?this.handleInvalidState(b,c):b._markedForLayout&&((b._preLayout&&b._preLayout(e,h,H,i)||b._needsMeasuring)&&G(b,b,b._layoutCoefficients,this),j=b._layoutCoefficients,
-a=j.width,u=j.minWidth,d=j.height,x=j.minHeight,k=j.sandboxWidth,t=j.sandboxHeight,r=j.left,j=j.top,a=a.x1*e+a.x2,void 0!==u.x1&&(a=Math.max(a,u.x1*e+u.x2)),d=d.x1*h+d.x2,void 0!==x.x1&&(d=Math.max(d,x.x1*h+x.x2)),y=b._getContentSize?b._getContentSize(a,d):b._layout._doLayout(b,isNaN(a)?e:a-b._borderLeftWidth-b._borderRightWidth,isNaN(d)?h:d-b._borderTopWidth-b._borderBottomWidth,isNaN(a),isNaN(d)),isNaN(a)&&(a=y.width+b._borderLeftWidth+b._borderRightWidth,void 0!==u.x1&&(a=Math.max(a,u.x1*e+u.x2))),
-isNaN(d)&&(d=y.height+b._borderTopWidth+b._borderBottomWidth,void 0!==x.x1&&(d=Math.max(d,x.x1*h+x.x2))),H&&0!==r.x1?l.push(b):v=r.x1*e+r.x2*a+r.x3,i&&0!==j.x1?C.push(b):w=j.x1*h+j.x2*d+j.x3,b._measuredSandboxWidth=k=k.x1*h+k.x2+a+(isNaN(v)?0:v),b._measuredSandboxHeight=t=t.x1*h+t.x2+d+(isNaN(w)?0:w),k>g.width&&(g.width=k),t>g.height&&(g.height=t),b._measuredWidth=a,b._measuredHeight=d,b._measuredLeft=v,b._measuredTop=w);z=l.length;for(f=0;f<z;f++)b=l[f],r=b._layoutCoefficients.left,k=b._layoutCoefficients.sandboxWidth,
-b._measuredLeft=v=r.x1*g.width+r.x2*a+r.x3,b._measuredSandboxWidth=k.x1*h+k.x2+b._measuredWidth+v,k=b._measuredSandboxWidth,k>g.width&&(g.width=k);z=C.length;for(f=0;f<z;f++)b=C[f],j=b._layoutCoefficients.top,t=b._layoutCoefficients.sandboxHeight,b._measuredTop=w=j.x1*g.height+j.x2*d+j.x3,b._measuredSandboxHeight=t.x1*h+t.x2+b._measuredHeight+w,t=b._measuredSandboxHeight,t>g.height&&(g.height=t);z=n.length;for(f=0;f<z;f++)b=n[f],b._markedForLayout&&(m._elementLayoutCount++,c=b.domNode.style,c.zIndex=
-b.zIndex,c.left=E(b._measuredLeft)+"px",c.top=E(b._measuredTop)+"px",c.width=E(b._measuredWidth-b._borderLeftWidth-b._borderRightWidth)+"px",c.height=E(b._measuredHeight-b._borderTopWidth-b._borderBottomWidth)+"px",b._markedForLayout=!1,b.fireEvent("postlayout"));return this._computedSize=g},_getWidth:function(c,e){!l(e)&&2>l(c.left)+l(c.center&&c.center.x)+l(c.right)&&(e=c._defaultWidth);return e===m.INHERIT?c._parent._parent?c._parent._parent._layout._getWidth(c._parent,c._parent.width)===m.SIZE?
-m.SIZE:m.FILL:m.FILL:e},_getHeight:function(c,e){!l(e)&&2>l(c.top)+l(c.center&&c.center.y)+l(c.bottom)&&(e=c._defaultHeight);return e===m.INHERIT?c._parent._parent?c._parent._parent._layout._getHeight(c._parent,c._parent.height)===m.SIZE?m.SIZE:m.FILL:m.FILL:e},_isDependentOnParent:function(c){c=c._layoutCoefficients;return!isNaN(c.width.x1)&&0!==c.width.x1||!isNaN(c.height.x1)&&0!==c.height.x1||0!==c.left.x1||0!==c.top.x1},_doAnimationLayout:function(c,e){var h=c._parent._measuredWidth,m=c._parent._measuredHeight,
-i=e.width.x1*h+e.width.x2,g=e.height.x1*m+e.height.x2;return{width:i,height:g,left:e.left.x1*h+e.left.x2*i+e.left.x3,top:e.top.x1*m+e.top.x2*g+e.top.x3}},_measureNode:function(c,e,h,l){c._needsMeasuring=!1;for(var i=l.getValueType,g=l.computeValue,n=l._getWidth(c,e.width),b=i(n),f=g(n,b),j=e._minWidth,n=i(j),j=g(j,n),c=l._getHeight(c,e.height),a=i(c),d=g(c,a),k=e._minHeight,c=i(k),t=g(k,c),r=e.left,k=i(r),r=g(r,k),u=e.center&&e.center.x,x=i(u),u=g(u,x),y=e.right,v=i(y),y=g(y,v),w=e.top,E=i(w),w=g(w,
-E),C=e.center&&e.center.y,z=i(C),C=g(C,z),e=e.bottom,i=i(e),g=g(e,i),e=h.sandboxWidth,G=h.sandboxHeight,b=[[b,f,k,r,x,u,v,y],[a,d,E,w,z,C,i,g]],s,F,B,o,D,A,p,q,f=0;2>f;f++)a=b[f],s=a[0],F=a[1],B=a[2],o=a[3],D=a[4],A=a[5],p=a[6],q=a[7],a=d=0,s===m.SIZE?a=d=NaN:s===m.FILL?(a=1,"%"===B?a-=o:"#"===B?d=-o:"%"===p?a-=q:"#"===p&&(d=-q)):"%"===s?a=F:"#"===s?d=F:"%"===B?"%"===D?a=2*(A-o):"#"===D?(a=-2*o,d=2*A):"%"===p?a=1-o-q:"#"===p&&(a=1-o,d=-q):"#"===B?"%"===D?(a=2*A,d=-2*o):"#"===D?d=2*(A-o):"%"===p?(a=
-1-q,d=-o):"#"===p&&(a=1,d=-q-o):"%"===D?"%"===p?a=2*(q-A):"#"===p&&(a=-2*A,d=2*q):"#"===D&&("%"===p?(a=2*q,d=-2*A):"#"===p&&(d=2*(q-A))),h[s=0===f?"width":"height"].x1=a,h[s].x2=d;b={minWidth:[n,j,k,r,x,u,v,y],minHeight:[c,t,E,w,z,C,i,g]};for(f in b)a=b[f],s=a[0],F=a[1],B=a[2],o=a[3],p=a[6],q=a[7],a=d=n=0,s===m.SIZE?a=d=NaN:s===m.FILL?(a=1,"%"===B?a-=o:"#"===B?d=-o:"%"===p?a-=q:"#"===p&&(d=-q)):"%"===s?a=F:"#"===s?d=F:a=d=n=void 0,h[f].x1=a,h[f].x2=d,h[f].x3=n;b=[[k,r,x,u,v,y],[E,w,z,C,i,g]];for(f=
-0;2>f;f++){a=b[f];B=a[0];o=a[1];D=a[2];A=a[3];p=a[4];q=a[5];a=d=n=0;if("%"===B)a=o;else if("#"===B)n=o;else if("%"===D)a=A,d=-0.5;else if("#"===D)d=-0.5,n=A;else if("%"===p)a=1-q,d=-1;else if("#"===p)a=1,d=-1,n=-q;else switch("left"===f?l._defaultHorizontalAlignment:l._defaultVerticalAlignment){case "center":a=0.5;d=-0.5;break;case "end":a=1,d=-1}h[s=0===f?"left":"top"].x1=a;h[s].x2=d;h[s].x3=n}e.x1="%"===v?y:0;e.x2="#"===v?y:0;G.x1="%"===i?g:0;G.x2="#"===i?g:0},_defaultHorizontalAlignment:"center",
-_defaultVerticalAlignment:"center"})});
+define(["Ti/_/Layouts/Base", "Ti/_/declare", "Ti/UI", "Ti/_/lang"], function(Base, declare, UI, lang) {
+	
+	var isDef = lang.isDef,
+		pixelUnits = "px",
+		round = Math.round;
+
+	return declare("Ti._.Layouts.Composite", Base, {
+		
+		_doLayout: function(element, width, height, isWidthSize, isHeightSize) {
+			var computedSize = {width: 0, height: 0},
+				children = element._children,
+				child,
+				i = 0,
+				layoutCoefficients, 
+				widthLayoutCoefficients, heightLayoutCoefficients, sandboxWidthLayoutCoefficients, sandboxHeightLayoutCoefficients, topLayoutCoefficients, leftLayoutCoefficients, 
+				minWidthLayoutCoefficients, minHeightLayoutCoefficients,
+				childSize,
+				measuredWidth, measuredHeight, measuredSandboxHeight, measuredSandboxWidth, measuredLeft, measuredTop,
+				deferredLeftCalculations = [],
+				deferredTopCalculations = [],
+				len = children.length,
+				verifyChild = this.verifyChild,
+				updateBorder = this.updateBorder,
+				measureNode = this._measureNode,
+				style;
+			
+			// Calculate size and position for the children
+			for(i = 0; i < len; i++) {
+				
+				child = element._children[i];
+				if (!child._alive || !child.domNode) {
+					this.handleInvalidState(child,element);
+				} else {
+					
+					if (child._markedForLayout) {
+						((child._preLayout && child._preLayout(width, height, isWidthSize, isHeightSize)) || child._needsMeasuring) && measureNode(child, child, child._layoutCoefficients, this);
+						
+						layoutCoefficients = child._layoutCoefficients;
+						widthLayoutCoefficients = layoutCoefficients.width;
+						minWidthLayoutCoefficients = layoutCoefficients.minWidth;
+						heightLayoutCoefficients = layoutCoefficients.height;
+						minHeightLayoutCoefficients = layoutCoefficients.minHeight;
+						sandboxWidthLayoutCoefficients = layoutCoefficients.sandboxWidth;
+						sandboxHeightLayoutCoefficients = layoutCoefficients.sandboxHeight;
+						leftLayoutCoefficients = layoutCoefficients.left;
+						topLayoutCoefficients = layoutCoefficients.top;
+						
+						measuredWidth = widthLayoutCoefficients.x1 * width + widthLayoutCoefficients.x2;
+						minWidthLayoutCoefficients.x1 !== void 0 && (measuredWidth = Math.max(measuredWidth, 
+							minWidthLayoutCoefficients.x1 * width + minWidthLayoutCoefficients.x2));
+						
+						measuredHeight = heightLayoutCoefficients.x1 * height + heightLayoutCoefficients.x2;
+						minHeightLayoutCoefficients.x1 !== void 0 && (measuredHeight = Math.max(measuredHeight, 
+							minHeightLayoutCoefficients.x1 * height + minHeightLayoutCoefficients.x2));
+						
+						if (child._getContentSize) {
+							childSize = child._getContentSize(measuredWidth, measuredHeight);
+						} else {
+							childSize = child._layout._doLayout(
+								child, 
+								isNaN(measuredWidth) ? width : measuredWidth - child._borderLeftWidth - child._borderRightWidth, 
+								isNaN(measuredHeight) ? height : measuredHeight - child._borderTopWidth - child._borderBottomWidth, 
+								isNaN(measuredWidth), 
+								isNaN(measuredHeight));
+						}
+						
+						if (isNaN(measuredWidth)) {
+							measuredWidth = childSize.width + child._borderLeftWidth + child._borderRightWidth;
+							minWidthLayoutCoefficients.x1 !== void 0 && (measuredWidth = Math.max(measuredWidth, 
+								minWidthLayoutCoefficients.x1 * width + minWidthLayoutCoefficients.x2));
+						}
+						if (isNaN(measuredHeight)) {
+							measuredHeight = childSize.height + child._borderTopWidth + child._borderBottomWidth;
+							minHeightLayoutCoefficients.x1 !== void 0 && (measuredHeight = Math.max(measuredHeight, 
+								minHeightLayoutCoefficients.x1 * height + minHeightLayoutCoefficients.x2));
+						}
+						
+						if (isWidthSize && leftLayoutCoefficients.x1 !== 0) {
+							deferredLeftCalculations.push(child);
+						} else {
+							measuredLeft = leftLayoutCoefficients.x1 * width + leftLayoutCoefficients.x2 * measuredWidth + leftLayoutCoefficients.x3;
+						}
+						if (isHeightSize && topLayoutCoefficients.x1 !== 0) {
+							deferredTopCalculations.push(child);
+						} else {
+							measuredTop = topLayoutCoefficients.x1 * height + topLayoutCoefficients.x2 * measuredHeight + topLayoutCoefficients.x3;
+						}
+						
+						child._measuredSandboxWidth = measuredSandboxWidth = sandboxWidthLayoutCoefficients.x1 * height + sandboxWidthLayoutCoefficients.x2 + measuredWidth + (isNaN(measuredLeft) ? 0 : measuredLeft);
+						child._measuredSandboxHeight = measuredSandboxHeight = sandboxHeightLayoutCoefficients.x1 * height + sandboxHeightLayoutCoefficients.x2 + measuredHeight + (isNaN(measuredTop) ? 0 : measuredTop);
+					
+						// Update the size of the component
+						measuredSandboxWidth > computedSize.width && (computedSize.width = measuredSandboxWidth);
+						measuredSandboxHeight > computedSize.height && (computedSize.height = measuredSandboxHeight);
+						
+						child._measuredWidth = measuredWidth;
+						child._measuredHeight = measuredHeight;
+						child._measuredLeft = measuredLeft;
+						child._measuredTop = measuredTop;
+					}
+				}
+			}
+			
+			// Second pass, if necessary, to determine the left/top values
+			len = deferredLeftCalculations.length;
+			for(i = 0; i < len; i++) {
+				child = deferredLeftCalculations[i];
+				leftLayoutCoefficients = child._layoutCoefficients.left;
+				sandboxWidthLayoutCoefficients = child._layoutCoefficients.sandboxWidth;
+				child._measuredLeft = measuredLeft = leftLayoutCoefficients.x1 * computedSize.width + leftLayoutCoefficients.x2 * measuredWidth + leftLayoutCoefficients.x3;
+				child._measuredSandboxWidth = measuredSandboxWidth = sandboxWidthLayoutCoefficients.x1 * height + sandboxWidthLayoutCoefficients.x2 + child._measuredWidth + measuredLeft;
+				
+				// Update the size of the component
+				measuredSandboxWidth = child._measuredSandboxWidth;
+				measuredSandboxWidth > computedSize.width && (computedSize.width = measuredSandboxWidth);
+			}
+			len = deferredTopCalculations.length;
+			for(i = 0; i < len; i++) {
+				child = deferredTopCalculations[i];
+				topLayoutCoefficients = child._layoutCoefficients.top;
+				sandboxHeightLayoutCoefficients = child._layoutCoefficients.sandboxHeight;
+				child._measuredTop = measuredTop = topLayoutCoefficients.x1 * computedSize.height + topLayoutCoefficients.x2 * measuredHeight + topLayoutCoefficients.x3;
+				child._measuredSandboxHeight = measuredSandboxHeight = sandboxHeightLayoutCoefficients.x1 * height + sandboxHeightLayoutCoefficients.x2 + child._measuredHeight + measuredTop;
+				
+				// Update the size of the component
+				measuredSandboxHeight = child._measuredSandboxHeight;
+				measuredSandboxHeight > computedSize.height && (computedSize.height = measuredSandboxHeight);
+			}
+			
+			// Position the children
+			len = children.length;
+			for(i = 0; i < len; i++) {
+				child = children[i];
+				if (child._markedForLayout) {
+					UI._elementLayoutCount++;
+					style = child.domNode.style;
+					style.zIndex = child.zIndex;
+					style.left = round(child._measuredLeft) + pixelUnits;
+					style.top = round(child._measuredTop) + pixelUnits;
+					style.width = round(child._measuredWidth - child._borderLeftWidth - child._borderRightWidth) + pixelUnits;
+					style.height = round(child._measuredHeight - child._borderTopWidth - child._borderBottomWidth) + pixelUnits;
+					child._markedForLayout = false;
+					child.fireEvent("postlayout");
+				}
+			}
+			
+			return this._computedSize = computedSize;
+		},
+		
+		_getWidth: function(node, width) {
+			
+			// Get the width or default width, depending on which one is needed
+			!isDef(width) && (isDef(node.left) + isDef(node.center && node.center.x) + isDef(node.right) < 2) && (width = node._defaultWidth);
+			
+			// Check if the width is INHERIT, and if so fetch the inherited width
+			if (width === UI.INHERIT) {
+				if (node._parent._parent) {
+					return node._parent._parent._layout._getWidth(node._parent, node._parent.width) === UI.SIZE ? UI.SIZE : UI.FILL;
+				}
+				// This is the root level content container, which we know has a width of FILL
+				return UI.FILL;
+			}
+			return width;
+		},
+		
+		_getHeight: function(node, height) {
+			
+			// Get the height or default height, depending on which one is needed
+			!isDef(height) && (isDef(node.top) + isDef(node.center && node.center.y) + isDef(node.bottom) < 2) && (height = node._defaultHeight);
+			
+			// Check if the width is INHERIT, and if so fetch the inherited width
+			if (height === UI.INHERIT) {
+				if (node._parent._parent) {
+					return node._parent._parent._layout._getHeight(node._parent, node._parent.height) === UI.SIZE ? UI.SIZE : UI.FILL;
+				}
+				// This is the root level content container, which we know has a width of FILL
+				return UI.FILL;
+			}
+			return height;
+		},
+		
+		_isDependentOnParent: function(node){
+			var layoutCoefficients = node._layoutCoefficients;
+			return (!isNaN(layoutCoefficients.width.x1) && layoutCoefficients.width.x1 !== 0) || // width
+				(!isNaN(layoutCoefficients.height.x1) && layoutCoefficients.height.x1 !== 0) || // height
+				layoutCoefficients.left.x1 !== 0 || // left
+				layoutCoefficients.top.x1 !== 0; // top
+		},
+		
+		_doAnimationLayout: function(node, animationCoefficients) {
+			
+			var parentWidth = node._parent._measuredWidth,
+				parentHeight = node._parent._measuredHeight,
+				nodeWidth = node._measuredWidth,
+				nodeHeight = node._measuredHeight,
+				width = animationCoefficients.width.x1 * parentWidth + animationCoefficients.width.x2,
+				height = animationCoefficients.height.x1 * parentHeight + animationCoefficients.height.x2;
+			
+			return {
+				width: width,
+				height: height,
+				left: animationCoefficients.left.x1 * parentWidth + animationCoefficients.left.x2 * width + animationCoefficients.left.x3,
+				top: animationCoefficients.top.x1 * parentHeight + animationCoefficients.top.x2 * height + animationCoefficients.top.x3
+			}
+		},
+		
+		_measureNode: function(node, layoutProperties, layoutCoefficients, self) {
+			
+			node._needsMeasuring = false;
+			
+			// Pre-processing
+			var getValueType = self.getValueType,
+				computeValue = self.computeValue,
+			
+				width = self._getWidth(node, layoutProperties.width),
+				widthType = getValueType(width),
+				widthValue = computeValue(width, widthType),
+			
+				minWidth = layoutProperties._minWidth,
+				minWidthType = getValueType(minWidth),
+				minWidthValue = computeValue(minWidth, minWidthType),
+			
+				height = self._getHeight(node, layoutProperties.height),
+				heightType = getValueType(height),
+				heightValue = computeValue(height, heightType),
+			
+				minHeight = layoutProperties._minHeight,
+				minHeightType = getValueType(minHeight),
+				minHeightValue = computeValue(minHeight, minHeightType),
+			
+				left = layoutProperties.left,
+				leftType = getValueType(left),
+				leftValue = computeValue(left, leftType),
+				
+				centerX = layoutProperties.center && layoutProperties.center.x,
+				centerXType = getValueType(centerX),
+				centerXValue = computeValue(centerX, centerXType),
+				
+				right = layoutProperties.right,
+				rightType = getValueType(right),
+				rightValue = computeValue(right, rightType),
+				
+				top = layoutProperties.top,
+				topType = getValueType(top),
+				topValue = computeValue(top, topType),
+				
+				centerY = layoutProperties.center && layoutProperties.center.y,
+				centerYType = getValueType(centerY),
+				centerYValue = computeValue(centerY, centerYType),
+				
+				bottom = layoutProperties.bottom,
+				bottomType = getValueType(bottom),
+				bottomValue = computeValue(bottom, bottomType),
+				
+				x1, x2, x3,
+				
+				sandboxWidthLayoutCoefficients = layoutCoefficients.sandboxWidth,
+				sandboxHeightLayoutCoefficients = layoutCoefficients.sandboxHeight,
+			
+				// Width/height rule evaluation
+				paramsSet = [
+					[widthType, widthValue, leftType, leftValue, centerXType, centerXValue, rightType, rightValue],
+					[heightType, heightValue, topType, topValue, centerYType, centerYValue, bottomType, bottomValue]
+				],
+				params, sizeType, sizeValue, startType, startValue, centerType, centerValue, endType, endValue,
+				i = 0,
+				type;
+			for (; i < 2; i++) {
+				
+				params = paramsSet[i];
+				sizeType = params[0];
+				sizeValue = params[1];
+				startType = params[2];
+				startValue = params[3];
+				centerType = params[4];
+				centerValue = params[5];
+				endType = params[6];
+				endValue = params[7];
+				
+				x1 = x2 = 0;
+				if (sizeType === UI.SIZE) {
+					x1 = x2 = NaN;
+				} else if (sizeType === UI.FILL) {
+					x1 = 1;
+					if (startType === "%") {
+						x1 -= startValue;
+					} else if (startType === "#") {
+						x2 = -startValue;
+					} else if (endType === "%") {
+						x1 -= endValue;
+					} else if (endType === "#") {
+						x2 = -endValue;
+					}
+				} else if (sizeType === "%") {
+					x1 = sizeValue;
+				} else if (sizeType === "#") {
+					x2 = sizeValue;
+				} else if (startType === "%") {
+					if (centerType === "%") {
+						x1 = 2 * (centerValue - startValue);
+					} else if (centerType === "#") {
+						x1 = -2 * startValue;
+						x2 = 2 * centerValue;
+					} else if (endType === "%") {
+						x1 = 1 - startValue - endValue;
+					} else if (endType === "#") {
+						x1 = 1 - startValue;
+						x2 = -endValue;
+					}
+				} else if (startType === "#") {
+					if (centerType === "%") {
+						x1 = 2 * centerValue;
+						x2 = -2 * startValue;
+					} else if (centerType === "#") {
+						x2 = 2 * (centerValue - startValue);
+					} else if (endType === "%") {
+						x1 = 1 - endValue;
+						x2 = -startValue;
+					} else if (endType === "#") {
+						x1 = 1;
+						x2 = -endValue - startValue;
+					}
+				} else if (centerType === "%") {
+					if (endType === "%") {
+						x1 = 2 * (endValue - centerValue);
+					} else if (endType === "#") {
+						x1 = -2 * centerValue;
+						x2 = 2 * endValue;
+					}
+				} else if (centerType === "#") {
+					if (endType === "%") {
+						x1 = 2 * endValue;
+						x2 = -2 * centerValue;
+					} else if (endType === "#") {
+						x2 = 2 * (endValue - centerValue);
+					}
+				}
+				layoutCoefficients[type = i === 0 ? "width" : "height"].x1 = x1;
+				layoutCoefficients[type].x2 = x2;
+			}
+			
+			// Min width/height rule evaluation
+			paramsSet = {
+				minWidth: [minWidthType, minWidthValue, leftType, leftValue, centerXType, centerXValue, rightType, rightValue],
+				minHeight: [minHeightType, minHeightValue, topType, topValue, centerYType, centerYValue, bottomType, bottomValue]
+			};
+			for (i in paramsSet) {
+				
+				params = paramsSet[i];
+				sizeType = params[0];
+				sizeValue = params[1];
+				startType = params[2];
+				startValue = params[3];
+				centerType = params[4];
+				centerValue = params[5];
+				endType = params[6];
+				endValue = params[7];
+				
+				x1 = x2 = x3 = 0;
+				if (sizeType === UI.SIZE) {
+					x1 = x2 = NaN;
+				} else if (sizeType === UI.FILL) {
+					x1 = 1;
+					if (startType === "%") {
+						x1 -= startValue;
+					} else if (startType === "#") {
+						x2 = -startValue;
+					} else if (endType === "%") {
+						x1 -= endValue;
+					} else if (endType === "#") {
+						x2 = -endValue;
+					}
+				} else if (sizeType === "%") {
+					x1 = sizeValue;
+				} else if (sizeType === "#") {
+					x2 = sizeValue;
+				} else {
+					x1 = x2 = x3 = void 0;
+				}
+				layoutCoefficients[i].x1 = x1;
+				layoutCoefficients[i].x2 = x2;
+				layoutCoefficients[i].x3 = x3;
+			}
+			
+			// Left/top rule evaluation
+			paramsSet = [
+				[leftType, leftValue, centerXType, centerXValue, rightType, rightValue],
+				[topType, topValue, centerYType, centerYValue, bottomType, bottomValue]
+			];
+			for (i = 0; i < 2; i++) {
+				
+				params = paramsSet[i];
+				startType = params[0];
+				startValue = params[1];
+				centerType = params[2];
+				centerValue = params[3];
+				endType = params[4];
+				endValue = params[5];
+					
+				x1 = x2 = x3 = 0;
+				if (startType === "%") {
+					x1 = startValue;
+				} else if(startType === "#") {
+					x3 = startValue;
+				} else if (centerType === "%") {
+					x1 = centerValue;
+					x2 = -0.5;
+				} else if (centerType === "#") {
+					x2 = -0.5;
+					x3 = centerValue;
+				} else if (endType === "%") {
+					x1 = 1 - endValue;
+					x2 = -1;
+				} else if (endType === "#") {
+					x1 = 1;
+					x2 = -1;
+					x3 = -endValue;
+				} else { 
+					switch(i === "left" ? self._defaultHorizontalAlignment : self._defaultVerticalAlignment) {
+						case "center": 
+							x1 = 0.5;
+							x2 = -0.5;
+							break;
+						case "end":
+							x1 = 1;
+							x2 = -1;
+					}
+				}
+				layoutCoefficients[type = i === 0 ? "left" : "top"].x1 = x1;
+				layoutCoefficients[type].x2 = x2;
+				layoutCoefficients[type].x3 = x3;
+			}
+			
+			// Sandbox width/height rule evaluation
+			sandboxWidthLayoutCoefficients.x1 = rightType === "%" ? rightValue : 0;
+			sandboxWidthLayoutCoefficients.x2 = rightType === "#" ? rightValue : 0;
+			sandboxHeightLayoutCoefficients.x1 = bottomType === "%" ? bottomValue : 0;
+			sandboxHeightLayoutCoefficients.x2 = bottomType === "#" ? bottomValue : 0;
+		},
+		
+		_defaultHorizontalAlignment: "center",
+		
+		_defaultVerticalAlignment: "center"
+		
+	});
+
+});

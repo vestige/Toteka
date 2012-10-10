@@ -1,5 +1,179 @@
-define(["Ti/_/declare","Ti/_/UI/KineticScrollView","Ti/_/style","Ti/_/lang","Ti/UI"],function(j,k,m,l,c){var f=l.isDef;return j("Ti.UI.ScrollView",k,{constructor:function(){this._initKineticScrollView(c.createView({width:c.SIZE,height:c.SIZE,_minWidth:"100%",_minHeight:"100%",left:0,top:0}),"both","both",1)},_handleMouseWheel:function(){this._isScrollBarActive&&this.fireEvent("scroll",{x:-this._currentTranslationX,y:-this._currentTranslationY,dragging:!1,decelerating:!1})},_handleDragStart:function(){this.fireEvent("dragStart")},
-_handleDrag:function(){this.fireEvent("scroll",{x:-this._currentTranslationX,y:-this._currentTranslationY,dragging:!0,decelerating:!1})},_handleDragEnd:function(a,b,e){if(f(b)){var d=this,c=Math.sqrt(b*b+e*e),a=c*c/0.001724,c=c/0.0010,g=Math.atan(Math.abs(e/b)),b=a*Math.cos(g)*(0>b?-1:1),e=a*Math.sin(g)*(0>e?-1:1),h=Math.min(0,Math.max(d._minTranslationX,d._currentTranslationX+b)),i=Math.min(0,Math.max(d._currentTranslationY+e));d.fireEvent("dragEnd",{decelerate:!0});d._animateToPosition(h,i,c,"ease-out",
-function(){d._setTranslation(h,i);d._endScrollBars();d.fireEvent("scrollEnd")})}},scrollTo:function(a,b){self._setTranslation(null!==a?-a:this._currentTranslationX,null!==b?-b:this._currentTranslationX)},_defaultWidth:c.FILL,_defaultHeight:c.FILL,_getContentOffset:function(){return this.contentOffset},_preLayout:function(){var a=this._contentContainer.layout===this.layout;this._contentContainer.layout=this.layout;return a},add:function(a){this._contentContainer._add(a);this._publish(a)},remove:function(a){this._contentContainer.remove(a);
-this._unpublish(a)},properties:{contentHeight:{get:function(){return this._contentContainer.height},set:function(a){return this._contentContainer.height=a}},contentOffset:{get:function(){return{x:-this._currentTranslationX,y:-this._currentTranslationY}},set:function(a){this._setTranslation(f(a.x)?-a.x:this._currentTranslationX,f(a.y)?-a.y:this._currentTranslationY);return a}},contentWidth:{get:function(){return this._contentContainer.width},set:function(a){return this._contentContainer.width=a}},
-disableBounce:!1,horizontalBounce:{set:function(a){return this._horizontalElastic=a},value:!0},showHorizontalScrollIndicator:{set:function(a,b){a!==b&&(a?this._createHorizontalScrollBar():this._destroyHorizontalScrollBar());return a},value:!0},showVerticalScrollIndicator:{set:function(a,b){a!==b&&(a?this._createVerticalScrollBar():this._destroyVerticalScrollBar());return a},value:!0},verticalBounce:{set:function(a){return this._verticalElastic=a},value:!0}}})});
+define(["Ti/_/declare", "Ti/_/UI/KineticScrollView", "Ti/_/style", "Ti/_/lang", "Ti/UI"],
+	function(declare, KineticScrollView, style, lang, UI) {
+
+	var isDef = lang.isDef,
+
+		// The amount of deceleration (in pixels/ms^2)
+		deceleration = 0.001;
+
+	return declare("Ti.UI.ScrollView", KineticScrollView, {
+
+		constructor: function(args) {
+			var self = this,
+				contentContainer,
+				scrollbarTimeout;
+			this._initKineticScrollView(contentContainer = UI.createView({
+				width: UI.SIZE,
+				height: UI.SIZE,
+				_minWidth: "100%",
+				_minHeight: "100%",
+				left: 0,
+				top: 0
+			}), "both", "both", 1);
+		},
+
+		_handleMouseWheel: function() {
+			this._isScrollBarActive && this.fireEvent("scroll",{
+				x: -this._currentTranslationX,
+				y: -this._currentTranslationY,
+				dragging: false,
+				decelerating: false
+			});
+		},
+
+		_handleDragStart: function() {
+			this.fireEvent("dragStart");
+		},
+
+		_handleDrag: function() {
+			this.fireEvent("scroll",{
+				x: -this._currentTranslationX,
+				y: -this._currentTranslationY,
+				dragging: true,
+				decelerating: false
+			});
+		},
+
+		_handleDragEnd: function(e, velocityX, velocityY) {
+			if (isDef(velocityX)) {
+				var self = this,
+					velocity = Math.sqrt(velocityX * velocityX + velocityY * velocityY),
+					distance = velocity * velocity / (1.724 * deceleration),
+					duration = velocity / deceleration,
+					theta = Math.atan(Math.abs(velocityY / velocityX)),
+					distanceX = distance * Math.cos(theta) * (velocityX < 0 ? -1 : 1),
+					distanceY = distance * Math.sin(theta) * (velocityY < 0 ? -1 : 1),
+					translationX = Math.min(0, Math.max(self._minTranslationX, self._currentTranslationX + distanceX)),
+					translationY = Math.min(0, Math.max(self._currentTranslationY + distanceY));
+				self.fireEvent("dragEnd",{
+					decelerate: true
+				});
+				self._animateToPosition(translationX, translationY, duration, "ease-out", function() {
+					self._setTranslation(translationX, translationY);
+					self._endScrollBars();
+					self.fireEvent("scrollEnd");
+				});
+			}
+		},
+
+		scrollTo: function(x, y) {
+			self._setTranslation(x !== null ? -x : this._currentTranslationX, y !== null ? -y : this._currentTranslationX);
+		},
+
+		_defaultWidth: UI.FILL,
+
+		_defaultHeight: UI.FILL,
+
+		_getContentOffset: function(){
+			return this.contentOffset;
+		},
+
+		_preLayout: function() {
+			var needsRecalculation = this._contentContainer.layout === this.layout
+			this._contentContainer.layout = this.layout;
+			return needsRecalculation;
+		},
+
+		add: function(view) {
+			this._contentContainer._add(view);
+			this._publish(view);
+		},
+
+		remove: function(view) {
+			this._contentContainer.remove(view);
+			this._unpublish(view);
+		},
+
+		properties: {
+			contentHeight: {
+				get: function(value) {
+					return this._contentContainer.height;
+				},
+				set: function(value) {
+					this._contentContainer.height = value;
+					return value;
+				}
+			},
+
+			contentOffset: {
+				get: function(value) {
+					return {
+						x: -this._currentTranslationX,
+						y: -this._currentTranslationY
+					};
+				},
+				set: function(value) {
+					this._setTranslation(isDef(value.x) ? -value.x : this._currentTranslationX,
+						isDef(value.y) ? -value.y : this._currentTranslationY);
+					return value;
+				}
+			},
+
+			contentWidth: {
+				get: function(value) {
+					return this._contentContainer.width;
+				},
+				set: function(value) {
+					this._contentContainer.width = value;
+					return value;
+				}
+			},
+			
+			disableBounce: false,
+			
+			horizontalBounce: {
+				set: function(value) {
+					return this._horizontalElastic = value;
+				},
+				value: true
+			},
+
+			showHorizontalScrollIndicator: {
+				set: function(value, oldValue) {
+					if (value !== oldValue) {
+						if (value) {
+							this._createHorizontalScrollBar();
+						} else {
+							this._destroyHorizontalScrollBar();
+						}
+					}
+					return value;
+				},
+				value: true
+			},
+
+			showVerticalScrollIndicator: {
+				set: function(value, oldValue) {
+					if (value !== oldValue) {
+						if (value) {
+							this._createVerticalScrollBar();
+						} else {
+							this._destroyVerticalScrollBar();
+						}
+					}
+					return value;
+				},
+				value: true
+			},
+			
+			verticalBounce: {
+				set: function(value) {
+					return this._verticalElastic = value;
+				},
+				value: true
+			}
+		}
+
+	});
+
+});

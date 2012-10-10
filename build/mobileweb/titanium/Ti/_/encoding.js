@@ -1,2 +1,62 @@
-define(["Ti/_/lang"],function(f){var d=String.fromCharCode;return f.setObject("Ti._.encoding",{utf8encode:function(b){var a,b=b.replace(/\r\n/g,"\n");for(i=0,len=b.length,bytes=[];i<len;)a=b.charCodeAt(i++),128>a?bytes.push(d(a)):(128<=a&&2048>a?bytes.push(d(a>>6|192)):(bytes.push(d(a>>12|224)),bytes.push(d(a>>6&63|128))),bytes.push(d(a&63|128)));return bytes.join("")},utf8decode:function(b){for(var a=[],c=0,f=b.length,e,g;c<f;)e=b.charCodeAt(c),128>e?(a.push(d(e)),c++):(g=b.charCodeAt(c+1),191<e&&
-224>e?(a.push(d((e&31)<<6|g&63)),c+=2):(a.push(d((e&15)<<12|(g&63)<<6|b.charCodeAt(c+2)&63)),c+=3));return a.join("")}})});
+define(["Ti/_/lang"], function(lang) {
+
+	var fromCharCode = String.fromCharCode,
+		x = 128;
+
+	return lang.setObject("Ti._.encoding", {
+
+		utf8encode: function(str) {
+			var c,
+				str = str.replace(/\r\n/g,"\n");
+				i = 0,
+				len = str.length,
+				bytes = [];
+	
+			while (i < len) {
+				c = str.charCodeAt(i++);
+
+				if (c < x) {
+					bytes.push(fromCharCode(c));
+				} else if((c >= x) && (c < 2048)) {
+					bytes.push(fromCharCode((c >> 6) | 192));
+					bytes.push(fromCharCode((c & 63) | x));
+				} else {
+					bytes.push(fromCharCode((c >> 12) | 224));
+					bytes.push(fromCharCode(((c >> 6) & 63) | x));
+					bytes.push(fromCharCode((c & 63) | x));
+				}
+			}
+
+			return bytes.join('');
+		},
+
+		utf8decode: function(bytes) {
+			var str = [],
+				i = 0,
+				len = bytes.length,
+				c,
+				c2;
+
+			while (i < len) {
+				c = bytes.charCodeAt(i);
+				if (c < x) {
+					str.push(fromCharCode(c));
+					i++;
+				} else {
+					c2 = bytes.charCodeAt(i+1);
+					if(c > 191 && c < 224) {
+						str.push(fromCharCode(((c & 31) << 6) | (c2 & 63)));
+						i += 2;
+					} else {
+						str.push(fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (bytes.charCodeAt(i+2) & 63)));
+						i += 3;
+					}
+				}
+			}
+
+			return str.join('');
+		}
+
+	});
+
+});

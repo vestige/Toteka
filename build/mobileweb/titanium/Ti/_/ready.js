@@ -1,2 +1,64 @@
-define(function(){function d(e,b,h){var a,f,d;require.is(e,"Number")||(h=b,b=e,e=1E3);a=h?function(){h.call(b)}:b;if(g)a();else{a.priority=e;for(f=0,d=c.length;f<d&&e>=c[f].priority;f++);c.splice(f,0,a)}}var b=document,i={loaded:1,complete:1},g=!!i[b.readyState],c=[];if(!g){var a=function(a){if(!(g||a&&"readystatechange"==a.type&&!i[b.readyState])){for(;c.length;)c.shift()();g=1}};c.concat([require.on(b,"DOMContentLoaded",a),require.on(window,"load",a)]);if("onreadystatechange"in b)c.push(require.on(b,
-"readystatechange",a));else{var j=function(){i[b.readyState]?a():setTimeout(j,30)};j()}}d.load=function(a,b,c){d(c)};return d});
+/**
+ * ready() functionality based on code from Dojo Toolkit.
+ *
+ * Dojo Toolkit
+ * Copyright (c) 2005-2011, The Dojo Foundation
+ * New BSD License
+ * <http://dojotoolkit.org>
+ */
+
+define(function() {
+	var doc = document,
+		readyStates = { "loaded": 1, "complete": 1 },
+		isReady = !!readyStates[doc.readyState],
+		readyQ = [];
+
+	if (!isReady) {
+		function detectReady(evt) {
+			if (isReady || (evt && evt.type == "readystatechange" && !readyStates[doc.readyState])) {
+				return;
+			}
+			while (readyQ.length) {
+				(readyQ.shift())();
+			}
+			isReady = 1;
+		}
+
+		readyQ.concat([
+			require.on(doc, "DOMContentLoaded", detectReady),
+			require.on(window, "load", detectReady)
+		]);
+
+		if ("onreadystatechange" in doc) {
+			readyQ.push(require.on(doc, "readystatechange", detectReady));
+		} else {
+			function poller() {
+				readyStates[doc.readyState] ? detectReady() : setTimeout(poller, 30);
+			}
+			poller();
+		}
+	}
+
+	function ready(priority, context, callback) {
+		var fn, i, l;
+		if (!require.is(priority, "Number")) {
+			callback = context;
+			context = priority;
+			priority = 1000;
+		}
+		fn = callback ? function(){ callback.call(context); } : context;
+		if (isReady) {
+			fn();
+		} else {
+			fn.priority = priority;
+			for (i = 0, l = readyQ.length; i < l && priority >= readyQ[i].priority; i++) {}
+			readyQ.splice(i, 0, fn);
+		}
+	}
+
+	ready.load = function(name, require, onLoad) {
+		ready(onLoad);
+	};
+
+	return ready;
+});

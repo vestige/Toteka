@@ -1,3 +1,92 @@
-define(["Ti/_/Evented","Ti/_/lang","Ti/UI","Ti/_/ready"],function(n,o,d,p){function j(){var a=!!(window.innerWidth&&window.innerWidth>window.innerHeight);c.constants.__values__.orientation=a?d.LANDSCAPE_LEFT:d.PORTRAIT;c.constants.__values__.landscape=a;c.constants.__values__.portrait=!a;return c.orientation}function k(a){var b=null,e=Math.abs(a.beta||a.y|0),l=Math.abs(a.gamma||a.x|0);5>e&&170<l&&(b=d.FACE_DOWN);5>e&&5>l&&(b=d.FACE_UP);50<e&&0>e&&f!=b&&(b=d.UPSIDE_PORTRAIT);null!==b&&f!==b&&c.fireEvent("orientationchange",
-{orientation:f=b,source:a.source})}var h=window,i=require.on,f=null,m=(new Date).getTime(),g={},c=o.setObject("Ti.Gesture",n,{_updateOrientation:function(){j();f!==c.orientation&&c.fireEvent("orientationchange",{orientation:f=c.orientation})},isLandscape:function(){return c.landscape},isPortrait:function(){return c.portrait},constants:{portrait:!1,landscape:!1,orientation:d.UNKNOWN}});p(function(){j()});i(h,"MozOrientation",k);i(h,"deviceorientation",k);i(h,"devicemotion",function(a){var b=a.acceleration||
-a.accelerationIncludingGravity,e,d;if(a=b&&{x:b.x,y:b.y,z:b.z,source:a.source}){if(void 0!==g.x&&(b=10<Math.abs(g.x-a.x),e=10<Math.abs(g.y-a.y),d=10<Math.abs(g.z-a.z),b&&(e||d)||e&&d))if(b=(new Date).getTime(),300<(a.timestamp=b-m))m=b,c.fireEvent("shake",a);g=a}});return c});
+define(["Ti/_/Evented", "Ti/_/lang", "Ti/UI", "Ti/_/ready"], function(Evented, lang, UI, ready) {
+
+	var win = window,
+		on = require.on,
+		lastOrient = null,
+		lastShake = (new Date()).getTime(),
+		lastAccel = {},
+		api = lang.setObject("Ti.Gesture", Evented, {
+			_updateOrientation: function() {
+				getWindowOrientation();
+				lastOrient !== api.orientation && api.fireEvent('orientationchange', {
+					orientation: lastOrient = api.orientation
+				});
+			},
+
+			isLandscape: function() {
+				return api.landscape;
+			},
+
+			isPortrait: function() {
+				return api.portrait;
+			},
+
+			constants: {
+				portrait: false,
+				landscape: false,
+				orientation: UI.UNKNOWN
+			}
+		});
+
+	function getWindowOrientation() {
+		var landscape = !!(window.innerWidth && (window.innerWidth > window.innerHeight));
+		api.constants.__values__.orientation = landscape ? UI.LANDSCAPE_LEFT : UI.PORTRAIT;
+		api.constants.__values__.landscape = landscape;
+		api.constants.__values__.portrait = !landscape;
+		return api.orientation;
+	}
+	ready(function() {
+		getWindowOrientation();
+	});
+
+	function deviceOrientation(evt) {
+		var orient = null,
+			beta = Math.abs(evt.beta || evt.y|0 * 90),
+			gamma = Math.abs(evt.gamma || evt.x|0 * 90);
+
+		beta < 5 && gamma > 170 && (orient = UI.FACE_DOWN);
+		beta < 5 && gamma < 5 && (orient = UI.FACE_UP);
+		beta > 50 && 0 > beta && lastOrient != orient && (orient = UI.UPSIDE_PORTRAIT);
+
+		if (orient !== null && lastOrient !== orient) {
+			api.fireEvent('orientationchange', {
+				orientation: lastOrient = orient,
+				source: evt.source
+			});
+		}
+	}
+
+	on(win, "MozOrientation", deviceOrientation);
+	on(win, "deviceorientation", deviceOrientation);
+
+	on(win, "devicemotion", function(evt) {
+		var e = evt.acceleration || evt.accelerationIncludingGravity,
+			x, y, z,
+			currentTime,
+			accel = e && {
+				x: e.x,
+				y: e.y,
+				z: e.z,
+				source: evt.source
+			};
+
+		if (accel) {
+			if (lastAccel.x !== void 0) {
+				x = Math.abs(lastAccel.x - accel.x) > 10;
+				y = Math.abs(lastAccel.y - accel.y) > 10;
+				z = Math.abs(lastAccel.z - accel.z) > 10;
+				if ((x && (y || z)) || (y && z)) {
+					currentTime = (new Date()).getTime();
+					if ((accel.timestamp = currentTime - lastShake) > 300) {
+						lastShake = currentTime;
+						api.fireEvent('shake', accel);
+					}
+				}
+			}
+			lastAccel = accel;
+		}
+	});
+
+	return api;
+
+});

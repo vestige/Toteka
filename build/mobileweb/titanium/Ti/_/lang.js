@@ -1,6 +1,202 @@
-define(["Ti/_/has"],function(p){function i(c,b){return[].concat(Array.prototype.slice.call(c,b||0))}function q(c,b){var f=i(arguments,2),d=g(b,"String");return function(){var e=c||j,a=d?e[b]:b;return a&&a.apply(e,f.concat(i(arguments)))}}var j=this,n,g=require.is;return{hitch:n=function(c,b){if(2<arguments.length)return q.apply(j,arguments);b||(b=c,c=null);if(g(b,"String")){c=c||j;if(!c[b])throw['hitch: scope["',b,'"] is null (scope="',c,'")'].join("");return function(){return c[b].apply(c,arguments||
-[])}}return!c?b:function(){return b.apply(c,arguments||[])}},isDef:function(c){return!g(c,"Undefined")},mixProps:function(c,b,f){var d,e,a,h={properties:1,constants:0};for(a in b)if(b.hasOwnProperty(a)&&!/^(constructor|__values__)$/.test(a))if(h.hasOwnProperty(a))for(e in d=c[a]||(c[a]={}),d.__values__||(d.__values__={}),b[a])(function(a,b,d,e,f,h,i){var k=g(f,"Object"),l=k&&g(f.get,"Function")&&f.get,j=k&&g(f.set,"Function")&&f.set,o=k&&g(f.post),m="Function"===o?f.post:"String"===o?n(b,f.post):
-0;k&&(l||j||m)?e[a]=f.value:g(f,"Function")?l=f:e[a]=f;Object.defineProperty(d,a,{get:function(){return l?l.call(b,e[a]):e[a]},set:function(c){var d=[c,e[a],a];d[0]=e[a]=j?j.apply(b,d):c;m&&m.apply(b,d)},configurable:!0,enumerable:!0});Object.defineProperty(c,a,{get:function(){return d[a]},set:function(c){if(!i)throw Error('Property "'+a+'" is read only');d[a]=c},configurable:!0,enumerable:!0});if(p("declare-property-methods")&&(i||a.toUpperCase()!==a))b["get"+h]=function(){return d[a]},i&&(b["set"+
-h]=function(c){return d[a]=c})})(e,c,d,d.__values__,b[a][e],e.substring(0,1).toUpperCase()+e.substring(1),h[a]);else f&&(c[a]=b[a]);return c},generateAccessors:function(c,b,f){function d(a){var b="get"+a.substring(0,1).toUpperCase()+a.substring(1);b in c.prototype||(c.prototype[b]=function(){return this[a]})}function e(a){var b="set"+a.substring(0,1).toUpperCase()+a.substring(1);b in c.prototype||(c.prototype[b]=function(b){return this[a]=b})}b&&b.split(",").forEach(d);f&&f.split(",").forEach(function(a){d(a);
-e(a)})},setObject:function(c){var b=c.split("."),f=b.pop(),d=window,e=0,a=b[e++];if(a){do d=a in d?d[a]:d[a]={};while(d&&(a=b[e++]))}if(d&&f){f=f in d?d[f]:d[f]={};for(e=1;e<arguments.length;e++)g(arguments[e],"Object")?this.mixProps(f,arguments[e],1):f=arguments[e];return f}},toArray:i,urlEncode:function(c){var b=encodeURIComponent,f=[],d,e,a,h;for(d in c)if(c.hasOwnProperty(d)){g(e=c[d],"Array")||(e=[e]);d=b(d)+"=";for(a=0,h=e.length;a<h;)f.push(d+b(e[a++]))}return f.join("&")},val:function(c,b){return void 0===
-c?b:c}}});
+/**
+ * hitch() and setObject() functionality based on code from Dojo Toolkit.
+ *
+ * Dojo Toolkit
+ * Copyright (c) 2005-2011, The Dojo Foundation
+ * New BSD License
+ * <http://dojotoolkit.org>
+ */
+
+define(["Ti/_/has"], function(has) {
+	var global = this,
+		hitch,
+		is = require.is;
+
+	function toArray(obj, offset) {
+		return [].concat(Array.prototype.slice.call(obj, offset||0));
+	}
+
+	function hitchArgs(scope, method) {
+		var pre = toArray(arguments, 2),
+			named = is(method, "String");
+		return function() {
+			var s = scope || global,
+				f = named ? s[method] : method;
+			return f && f.apply(s, pre.concat(toArray(arguments)));
+		};
+	}
+
+	return {
+		hitch: hitch = function(scope, method) {
+			if (arguments.length > 2) {
+				return hitchArgs.apply(global, arguments);
+			}
+			if (!method) {
+				method = scope;
+				scope = null;
+			}
+			if (is(method, "String")) {
+				scope = scope || global;
+				if (!scope[method]) {
+					throw(['hitch: scope["', method, '"] is null (scope="', scope, '")'].join(''));
+				}
+				return function() {
+					return scope[method].apply(scope, arguments || []);
+				};
+			}
+			return !scope ? method : function() {
+				return method.apply(scope, arguments || []);
+			};
+		},
+
+		isDef: function(it) {
+			return !is(it, "Undefined");
+		},
+
+		mixProps: function(dest, src, everything) {
+			var d, i, p, v, special = { properties: 1, constants: 0 };
+			for (p in src) {
+				if (src.hasOwnProperty(p) && !/^(constructor|__values__)$/.test(p)) {
+					if (special.hasOwnProperty(p)) {
+						d = dest[p] || (dest[p] = {});
+						d.__values__ || (d.__values__ = {});
+						for (i in src[p]) {
+							(function(property, externalDest, internalDest, valueDest, /* setter/getter, getter, or value */ descriptor, capitalizedName, writable) {
+								var o = is(descriptor, "Object"),
+									getter = o && is(descriptor.get, "Function") && descriptor.get,
+									setter = o && is(descriptor.set, "Function") && descriptor.set,
+									pt = o && is(descriptor.post),
+									post = pt === "Function" ? descriptor.post : pt === "String" ? hitch(externalDest, descriptor.post) : 0;
+
+								if (o && (getter || setter || post)) {
+									valueDest[property] = descriptor.value;
+								} else if (is(descriptor, "Function")) {
+									getter = descriptor;
+								} else {
+									valueDest[property] = descriptor;
+								}
+
+								// first set the internal private interface
+								Object.defineProperty(internalDest, property, {
+									get: function() {
+										return getter ? getter.call(externalDest, valueDest[property]) : valueDest[property];
+									},
+									set: function(v) {
+										var args = [v, valueDest[property], property];
+										args[0] = valueDest[property] = setter ? setter.apply(externalDest, args) : v;
+										post && post.apply(externalDest, args);
+									},
+									configurable: true,
+									enumerable: true
+								});
+
+								// this is the public interface
+								Object.defineProperty(dest, property, {
+									get: function() {
+										return internalDest[property];
+									},
+									set: function(v) {
+										if (!writable) {
+											throw new Error('Property "' + property + '" is read only');
+										}
+										internalDest[property] = v;
+									},
+									configurable: true,
+									enumerable: true
+								});
+
+								if (has("declare-property-methods") && (writable || property.toUpperCase() !== property)) {
+									externalDest["get" + capitalizedName] = function() { return internalDest[property]; };
+									writable && (externalDest["set" + capitalizedName] = function(v) { return internalDest[property] = v; });
+								}
+							}(i, dest, d, d.__values__, src[p][i], i.substring(0, 1).toUpperCase() + i.substring(1), special[p]));
+						}
+					} else if (everything) {
+						dest[p] = src[p];
+					}
+				}
+			}
+			return dest;
+		},
+		
+		generateAccessors: function(definition, readOnlyProps, props) {
+			
+			function generateGetter(prop) {
+				var getterName = "get" + prop.substring(0, 1).toUpperCase() + prop.substring(1);
+				if (!(getterName in definition.prototype)) {
+					definition.prototype[getterName] = function() {
+						return this[prop];
+					}
+				}
+			}
+			
+			function generateSetter(prop) {
+				var setterName = "set" + prop.substring(0, 1).toUpperCase() + prop.substring(1);
+				if (!(setterName in definition.prototype)) {
+					definition.prototype[setterName] = function(value) {
+						return this[prop] = value;
+					}
+				}
+			}
+			
+			readOnlyProps && readOnlyProps.split(",").forEach(generateGetter);
+			props && props.split(",").forEach(function(prop) {
+				generateGetter(prop);
+				generateSetter(prop);
+			});
+		},
+
+		setObject: function(name) {
+			var parts = name.split("."),
+				q = parts.pop(),
+				obj = window,
+				i = 0,
+				p = parts[i++];
+
+			if (p) {
+				do {
+					obj = p in obj ? obj[p] : (obj[p] = {});
+				} while (obj && (p = parts[i++]));
+			}
+
+			if (!obj || !q) {
+				return;
+			}
+			q = q in obj ? obj[q] : (obj[q] = {});
+
+			// need to mix args into values
+			for (i = 1; i < arguments.length; i++) {
+				is(arguments[i], "Object") ? this.mixProps(q, arguments[i], 1) : (q = arguments[i]);
+			}
+
+			return q;
+		},
+
+		toArray: toArray,
+
+		urlEncode: function(obj) {
+			var enc = encodeURIComponent,
+				pairs = [],
+				prop,
+				value,
+				i,
+				l;
+
+			for (prop in obj) {
+				if (obj.hasOwnProperty(prop)) {
+					is(value = obj[prop], "Array") || (value = [value]);
+					prop = enc(prop) + "=";
+					for (i = 0, l = value.length; i < l;) {
+						pairs.push(prop + enc(value[i++]));
+					}
+				}
+			}
+
+			return pairs.join("&");
+		},
+
+		val: function(originalValue, defaultValue) {
+			return originalValue === void 0 ? defaultValue : originalValue;
+		}
+	};
+});

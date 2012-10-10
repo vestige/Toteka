@@ -1,2 +1,54 @@
-define(function(){var f={},c=[];return{dynamic:!0,normalize:function(b,c){var d=b.split("!"),a=d[0];d.shift();return(/^\./.test(a)?c(a):a)+(d.length?"!"+d.join("!"):"")},load:function(b,e,d){var a;a=b.split("!");var g;if(g=1<a.length&&"sandbox"===a[0])a.shift(),b=a.join("!");b=e.toUrl(/^\//.test(b)?b:"./"+b,c.length?{name:c[c.length-1]}:null);a=f[b]||e.cache(b);if(!a)if(a=new XMLHttpRequest,a.open("GET",b,!1),a.send(null),200===a.status)a=a.responseText;else throw Error('Failed to load include "'+
-b+'": '+a.status);c.push(b);try{e.evaluate(f[b]=a,0,!g)}catch(h){throw h;}finally{c.pop()}d(a)}}});
+define(function() {
+	var cache = {},
+		stack = [];
+
+	return {
+		dynamic: true, // prevent the loader from caching the result
+
+		normalize: function(name, normalize) {
+			var parts = name.split("!"),
+				url = parts[0];
+			parts.shift();
+			return (/^\./.test(url) ? normalize(url) : url) + (parts.length ? "!" + parts.join("!") : "");
+		},
+
+		load: function(name, require, onLoad, config) {
+			var c,
+				x,
+				parts = name.split("!"),
+				len = parts.length,
+				url,
+				sandbox;
+
+			if (sandbox = len > 1 && parts[0] === "sandbox") {
+				parts.shift();
+				name = parts.join("!");
+			}
+
+			url = require.toUrl(/^\//.test(name) ? name : "./" + name, stack.length ? { name: stack[stack.length-1] } : null);
+			c = cache[url] || require.cache(url);
+
+			if (!c) {
+				x = new XMLHttpRequest();
+				x.open("GET", url, false);
+				x.send(null);
+				if (x.status === 200) {
+					c = x.responseText;
+				} else {
+					throw new Error("Failed to load include \"" + url + "\": " + x.status);
+				}
+			}
+
+			stack.push(url);
+			try {
+				require.evaluate(cache[url] = c, 0, !sandbox);
+			} catch (e) {
+				throw e;
+			} finally {
+				stack.pop();
+			}
+
+			onLoad(c);
+		}
+	};
+});

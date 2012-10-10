@@ -1,2 +1,83 @@
-define("Ti/_/declare,Ti/_/dom,Ti/_/UI/Element,Ti/_/lang,Ti/_/string,Ti/_/Layouts,Ti/_/style,Ti/UI".split(","),function(c,g,d,h,e,f,i,b){return c("Ti.UI.View",d,{constructor:function(){this.constants.__values__.children=[];this.layout="composite";this.containerNode=this.domNode},_publish:function(a){this.children.push(a);a._isPublished=1},_unpublish:function(a){var b=this.children,a=b.indexOf(a);!~a&&b.splice(a,1)},add:function(a){this._add(a);this._publish(a)},remove:function(a){this._remove(a);this._unpublish(a)},
-_defaultWidth:b.FILL,_defaultHeight:b.FILL,constants:{children:void 0},properties:{layout:{set:function(a){a=(a=a.match(/^(horizontal|vertical|constrainingHorizontal|constrainingVertical)$/))?a[0]:"composite";this._layout&&(this._layout.destroy(),this._layout=null);this._layout=new (f[e.capitalize("horizontal"===a&&!this.horizontalWrap?"constrainingHorizontal":a)])(this);return a}},horizontalWrap:{post:function(){this.layout=this.layout},value:!0}}})});
+define(["Ti/_/declare", "Ti/_/dom", "Ti/_/UI/Element", "Ti/_/lang", "Ti/_/string", "Ti/_/Layouts", "Ti/_/style", "Ti/UI"],
+	function(declare, dom, Element, lang, string, Layouts, style, UI) {
+
+	return declare("Ti.UI.View", Element, {
+
+		constructor: function() {
+			this.constants.__values__.children = [];
+			this.layout = "composite";
+			this.containerNode = this.domNode;
+		},
+
+		/**
+		 * Marks a view as "published," meaning it will show up in {@link Ti#UI#View#children} and can be the source of
+		 * UI events.
+		 *
+		 * @private
+		 * @name Ti#UI#View#_markPublished
+		 * @param {Ti.UI.View} view The view to mark as published.
+		 */
+		_publish: function(view) {
+			this.children.push(view);
+			view._isPublished = 1;
+		},
+
+		/**
+		 * Marks a view as "unpublished," meaning it will <em>not</em> show up in {@link Ti#UI#View#children} and can
+		 * <em>not</em> be the source of UI events.
+		 *
+		 * @private
+		 * @name Ti#UI#View#_markPublished
+		 * @param {Ti.UI.View} view The view to mark as unpublished.
+		 */
+		_unpublish: function(view) {
+			var children = this.children,
+				viewIdx = children.indexOf(view);
+			!~viewIdx && children.splice(viewIdx,1);
+		},
+
+		add: function(view) {
+			this._add(view);
+			this._publish(view);
+		},
+
+		remove: function(view) {
+			this._remove(view);
+			this._unpublish(view);
+		},
+
+		_defaultWidth: UI.FILL,
+
+		_defaultHeight: UI.FILL,
+
+		constants: {
+			children: void 0
+		},
+
+		properties: {
+			layout: {
+				set: function(value) {
+					var match = value.match(/^(horizontal|vertical|constrainingHorizontal|constrainingVertical)$/);
+					value = match ? match[0] : "composite";
+
+					if (this._layout) {
+						this._layout.destroy();
+						this._layout = null;
+					}
+
+					this._layout = new Layouts[string.capitalize(value === "horizontal" && !this.horizontalWrap ? "constrainingHorizontal" : value)](this);
+
+					return value;
+				}
+			},
+			horizontalWrap: {
+				post: function() {
+					this.layout = this.layout; // Force a new layout to be created.
+				},
+				value: true
+			}
+		}
+
+	});
+
+});

@@ -1,1 +1,25 @@
-define(["Ti/_/declare","Ti/_/lang","Ti/_/Gestures/GestureRecognizer"],function(b,g,c){return b("Ti._.Gestures.TouchEnd",c,{name:"touchend",processTouchEndEvent:function(f,d){if(!d._isGestureBlocked(this.name))for(var e=f.changedTouches,a=0,b=e.length,c=this.getSourceNode(f,d);a<b;a++)d._handleTouchEvent(this.name,{x:e[a].clientX,y:e[a].clientY,source:c})}})});
+define(["Ti/_/declare", "Ti/_/lang", "Ti/_/Gestures/GestureRecognizer"], function(declare,lang,GestureRecognizer) {
+
+	return declare("Ti._.Gestures.TouchEnd", GestureRecognizer, {
+
+		name: "touchend",
+
+		processTouchEndEvent: function(e, element){
+			if (!element._isGestureBlocked(this.name)) {
+				var changed = e.changedTouches,
+					i = 0,
+					l = changed.length,
+					src = this.getSourceNode(e, element);
+				for (; i < l; i++) {
+					element._handleTouchEvent(this.name, {
+						x: changed[i].clientX,
+						y: changed[i].clientY,
+						source: src
+					});
+				}
+			}
+		}
+
+	});
+
+});

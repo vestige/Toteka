@@ -1,2 +1,69 @@
-define(["Ti/_/Evented","Ti/_/lang"],function(h,i){function b(a){if(!a)throw Error(f);return c[a]}function d(a,b){if(!a)throw Error(f);b?c[a]=b:delete c[a];localStorage.setItem(e,JSON.stringify(c))}var e="ti:clipboard",f='Missing required argument "type"',g=localStorage.getItem(e),c=require.is(g,"String")&&JSON.parse(g)||{};return i.setObject("Ti.UI.Clipboard",h,{clearData:function(){c={};localStorage.setItem(e,JSON.stringify(c))},clearText:function(){d("text/plain")},getData:function(a){return b(a)||
-null},getText:function(){return b("text/plain")||null},hasData:function(a){return!!b(a)},hasText:function(){return!!b("text/plain")},setData:function(a,b){d(a,b)},setText:function(a){d("text/plain",a)}})});
+define(["Ti/_/Evented", "Ti/_/lang"], function(Evented, lang) {
+
+	var storageKey = "ti:clipboard",
+		plainText = "text/plain",
+		error = 'Missing required argument "type"',
+		value = localStorage.getItem(storageKey),
+		cache = (require.is(value, "String") && JSON.parse(value)) || {};
+
+	function get(type) {
+		if (!type) {
+			throw new Error(error);
+		}
+		return cache[type];
+	}
+
+	function set(type, data) {
+		if (!type) {
+			throw new Error(error);
+		}
+		if (data) {
+			cache[type] = data;
+		} else {
+			delete cache[type];
+		}
+		save()
+	}
+
+	function save() {
+		localStorage.setItem(storageKey, JSON.stringify(cache));
+	}
+
+	return lang.setObject("Ti.UI.Clipboard", Evented, {
+
+		clearData: function() {
+			cache = {};
+			save();
+		},
+
+		clearText: function() {
+			set(plainText);
+		},
+
+		getData: function(type) {
+			return get(type) || null;
+		},
+
+		getText: function() {
+			return get(plainText) || null;
+		},
+
+		hasData: function(type) {
+			return !!get(type);
+		},
+
+		hasText: function() {
+			return !!get(plainText);
+		},
+
+		setData: function(type, data) {
+			set(type, data);
+		},
+
+		setText: function(text) {
+			set(plainText, text);
+		}
+
+	});
+
+});
