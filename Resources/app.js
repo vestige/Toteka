@@ -83,9 +83,9 @@ var spanSwitch = Ti.UI.createSwitch({
     value: true 
 });
 
-function date_format(counting) {
-    var min = parseInt(counting / 60);
-    var sec = counting % 60;
+function date_format(seconds) {
+    var min = parseInt(seconds / 60);
+    var sec = seconds % 60;
     var disp_time = '';
 	
     if (min < 10) {
