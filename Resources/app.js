@@ -78,16 +78,31 @@ var clear = Ti.UI.createButton({
     height: 42,
 });
 
-var spanSwitch = Ti.UI.createSwitch({
-    left: 10,
-    value: true 
-});
-
-var demo = Ti.UI.createButton({
-    title: 'demo',
+var mode = Ti.UI.createButton({
+    title: 'mode',
     left: 30,
     height: 42,
 });
+
+var timer_option = Titanium.UI.createOptionDialog({
+    title: 'timer option',
+    options: ['keynote', 'recipe', 'world cafe', 'demo', 'cansel'],
+    cancel: 4
+});
+
+var optionLable = Ti.UI.createLabel({
+    text: 'none',
+    color: '#99ff99',
+    left: 10,
+})
+
+//
+var past_time;
+var total;
+var timer_id;
+var pause = 0;
+var remain;
+var timer_mode = -1;
 
 function date_format(seconds) {
     var min = parseInt(seconds / 60);
@@ -111,9 +126,9 @@ function update () {
 	
     if (tmp_time.getSeconds() != past_time.getSeconds()) {
         total -= 1;
-        if (total < 0) {
+        if (total <= 0) {
             qa.color = '#FFFF00';
-            qa.font = {fontSize: '120%', fontFamily: 'Expletus Sans'};
+            qa.font = {fontSize: '100%', fontFamily: 'Expletus Sans'};
             qa.text = 'Finish!';
             count.text = "88888888";
             stop.fireEvent('click');
@@ -131,25 +146,28 @@ function update () {
     }
 };
 
-var past_time;
-var total;
-var timer_id;
-var pause = 0;
-var remain;
-
-function initTotalandRemain(demo_mode) {
-    if (demo_mode) {
+function initTotalandRemain() {
+    switch (timer_mode) {
+    case 0: //keynote
+        total = 25 * 60;
+        remain = 5 * 60;
+        break;
+    case 1: //recipe   
+        total = 15 * 60;
+        remain = 5 * 60;
+        break;
+    case 2: //workd cafe    
+        total = 15 * 60;
+        remain = -1;
+        break;
+    case 3: //demo   
         total = 10;
         remain = 5;
-        return;
+        break;
+    default:
+        total = 0;
+        remain = -1;
     }
-    
-    if (spanSwitch.value) {
-        total = 25 * 60;
-    } else {
-        total = 15 * 60;
-    }
-    remain = 5 * 60;    
 };
 
 function initLabel() {
@@ -167,14 +185,14 @@ function timerClear(){
 
 clear.addEventListener('click', function (){
     timerClear();
-    initTotalandRemain(0);
+    initTotalandRemain();
     initLabel();
 });
 
 start.addEventListener('click', function () {
     if (pause === 0) {
         timerClear();
-        initTotalandRemain(0);
+        initTotalandRemain();
         initLabel();
     } else {
         var tmp_time = new Date();
@@ -189,12 +207,34 @@ stop.addEventListener('click', function () {
     pause = 1;
 });
 
-demo.addEventListener('click', function (){
-    timerClear();
-    initTotalandRemain(1);
-    initLabel();
-    pause = 0;
-    timer_id = setTimeout("update()", 300);
+timer_option.addEventListener('click', function(e){
+    switch (e.index) {
+    case 0:
+        optionLable.text = 'keynote';    
+        timer_mode = 0;            
+        break;
+    case 1:
+        optionLable.text = 'recipe';                
+        timer_mode = 1;            
+        break;
+    case 2:
+        optionLable.text = 'world cafe';                
+        timer_mode = 2;            
+        break;
+    case 3:
+        optionLable.text = 'demo';                
+        timer_mode = 3;            
+        break;
+    case 4:
+        return;
+    default:
+        optionLable.text = 'none';                
+    };
+    clear.fireEvent('click')
+});
+
+mode.addEventListener('click', function(){
+    timer_option.show();
 });
 
 top.add(caption);
@@ -204,13 +244,11 @@ contents.add(qa);
 toolview.add(start);
 toolview.add(stop);
 toolview.add(clear);
-toolview.add(spanSwitch);
-toolview.add(demo);
+toolview.add(mode);
+toolview.add(optionLable);
 footer.add(toolview);
 
 ground.add(top);
 ground.add(contents);
 ground.add(footer);
 ground.open();
-
-
