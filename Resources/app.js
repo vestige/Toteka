@@ -10,7 +10,7 @@ var top = Ti.UI.createView({
 });
 
 var caption = Ti.UI.createLabel({
-    text: 'toteka timer',
+    text: 'とてか 02',
     textAlign: 'center',
     color: '#ddd',
     width: '100%',
@@ -53,18 +53,14 @@ var toolview = Ti.UI.createView({
 var start = Ti.UI.createButton({
     title: 'start',
     height: 42,
-});
-
-var stop = Ti.UI.createButton({
-    title: 'stop',
-    left: 10,
-    height: 42,
+    width: 80,
 });
 
 var clear = Ti.UI.createButton({
     title: 'clear',
     left: 10,
     height: 42,
+    width: 80,
 });
 
 var mode = Ti.UI.createButton({
@@ -89,8 +85,9 @@ var past_time;
 var total = 0;
 var timer_id;
 var pause = 0;
-var remain;
+var remain = 0;
 var timer_mode = -1;
+var init = 1;
 
 function date_format(seconds) {
     var min = parseInt(seconds / 60);
@@ -117,7 +114,7 @@ function update () {
         if (total <= 0) {
             qa.color = '#FFFF00';
             qa.font = {fontSize: '100%'};
-            qa.text = 'Finish!';
+            qa.text = 'はくしゅ!';
             count.text = "888888";
             pause = 0;
         } else {
@@ -163,12 +160,14 @@ function initLabel() {
     qa.text = '　';
     qa.font = {fontSize: '70%'};
     contents.backgroundColor = '#000';
+    start.title = 'start';
 };
 
 function timerClear(){
     var start_time = new Date();
     past_time = start_time;
     pause = 0;
+    init = 1;
 };
 
 clear.addEventListener('click', function (){
@@ -178,18 +177,26 @@ clear.addEventListener('click', function (){
     initLabel();
 });
 
+function timeForward(){
+    pause = 0;
+    start.title = 'pause';
+    var tmp_time = new Date();
+    past_time = tmp_time;
+    timer_id = setTimeout("update()", 300);
+};
+
 start.addEventListener('click', function () {
     if (total === 0) return;
-    if (pause === 0) {
-        timerClear();
-        initTotalandRemain();
-        initLabel();
+    if (init === 1) {
+        init = 0;
+        timeForward();
+    } else if (pause === 1) {
+        timeForward();
     } else {
-        var tmp_time = new Date();
-        past_time = tmp_time;
+        pause = 1;
+        start.title = 'restart';
+        clearTimeout(timer_id);
     }
-    pause = 0;
-    timer_id = setTimeout("update()", 300);
 });
 
 stop.addEventListener('click', function () {
@@ -232,7 +239,6 @@ contents.add(count);
 contents.add(qa);
 
 toolview.add(start);
-toolview.add(stop);
 toolview.add(clear);
 toolview.add(mode);
 toolview.add(optionLable);
