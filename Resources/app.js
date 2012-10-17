@@ -1,17 +1,5 @@
 Titanium.UI.setBackgroundColor('#000');
 
-WebFontConfig = {
-    google: { families: [ 'Expletus+Sans::latin'] }
-};
-(function() {
-    var wf = document.createElement('script');
-    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-    wf.type = 'text/javascript';
-    wf.async = 'true';
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(wf, s);
- })();
-
 var ground = Ti.UI.createWindow({
     layout: 'vertical'
 });
@@ -26,7 +14,7 @@ var caption = Ti.UI.createLabel({
     textAlign: 'center',
     color: '#ddd',
     width: '100%',
-    font:{fontSize: '100%', fontFamily: 'Expletus Sans'},
+    font:{fontSize: '100%'},
 })
 
 var contents = Ti.UI.createView({
@@ -38,15 +26,16 @@ var contents = Ti.UI.createView({
 var count = Ti.UI.createLabel({
     text: '00:00',
     color: '#99ff99',
-    top: 80,
-    font:{fontSize: '250%'},
+    top: 50,
+    witdh: '100%',
+    font:{fontSize: '200%'},
 });
 
 var qa = Ti.UI.createLabel({
     text: '　',
     color: 'white',
     top: 5,
-    font:{fontSize: '70%', fontFamily:'Expletus Sans'},		
+    font:{fontSize: '70%'},		
 });
 
 var footer = Ti.UI.createView({
@@ -95,10 +84,9 @@ var optionLable = Ti.UI.createLabel({
     color: '#99ff99',
     left: 10,
 })
-
 //
 var past_time;
-var total;
+var total = 0;
 var timer_id;
 var pause = 0;
 var remain;
@@ -128,10 +116,10 @@ function update () {
         total -= 1;
         if (total <= 0) {
             qa.color = '#FFFF00';
-            qa.font = {fontSize: '100%', fontFamily: 'Expletus Sans'};
+            qa.font = {fontSize: '100%'};
             qa.text = 'Finish!';
-            count.text = "88888888";
-            stop.fireEvent('click');
+            count.text = "888888";
+            pause = 0;
         } else {
             if (total == remain) {
                 contents.backgroundColor = '#777';
@@ -173,7 +161,7 @@ function initTotalandRemain() {
 function initLabel() {
     count.text = date_format(total);
     qa.text = '　';
-    qa.font = {fontSize: '70%', fontFamily: 'Expletus Sans'};
+    qa.font = {fontSize: '70%'};
     contents.backgroundColor = '#000';
 };
 
@@ -184,12 +172,14 @@ function timerClear(){
 };
 
 clear.addEventListener('click', function (){
+    clearTimeout(timer_id);
     timerClear();
     initTotalandRemain();
     initLabel();
 });
 
 start.addEventListener('click', function () {
+    if (total === 0) return;
     if (pause === 0) {
         timerClear();
         initTotalandRemain();
