@@ -116,7 +116,6 @@ function update () {
             qa.font = {fontSize: '100%'};
             qa.text = 'はくしゅ!';
             count.text = "888888";
-            pause = 0;
         } else {
             if (total == remain) {
                 contents.backgroundColor = '#777';
@@ -186,7 +185,7 @@ function timeForward(){
 };
 
 start.addEventListener('click', function () {
-    if (total === 0) return;
+    if (total <= 0) return;
     if (init === 1) {
         init = 0;
         timeForward();
@@ -197,11 +196,6 @@ start.addEventListener('click', function () {
         start.title = 'restart';
         clearTimeout(timer_id);
     }
-});
-
-stop.addEventListener('click', function () {
-    clearTimeout(timer_id);
-    pause = 1;
 });
 
 timer_option.addEventListener('click', function(e){
